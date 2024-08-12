@@ -1,0 +1,48 @@
+/my-fullstack-app
+|-- /backend
+|   |-- /config
+|   |   |-- db.js
+|   |   |-- default.json
+|   |-- /controllers
+|   |   |-- userController.js
+|   |-- /models
+|   |   |-- User.js
+|   |-- /routes
+|   |   |-- api
+|   |   |   |-- users.js
+|   |-- /middleware
+|   |   |-- auth.js
+|   |-- /utils
+|   |   |-- errorHandler.js
+|   |-- /test
+|   |   |-- user.test.js
+|   |-- server.js
+|-- /frontend
+|   |-- /public
+|   |   |-- index.html
+|   |-- /src
+|   |   |-- /components
+|   |   |   |-- App.js
+|   |   |   |-- Navbar.js
+|   |   |-- /pages
+|   |   |   |-- Home.js
+|   |   |   |-- Login.js
+|   |   |-- /context
+|   |   |   |-- AuthContext.js
+|   |   |-- /hooks
+|   |   |   |-- useAuth.js
+|   |   |-- /services
+|   |   |   |-- api.js
+|   |   |-- /utils
+|   |   |   |-- constants.js
+|   |   |-- /styles
+|   |   |   |-- App.css
+|   |   |-- index.js
+|-- /scripts
+|   |-- deploy.sh
+|-- .env
+|-- .gitignore
+|-- package.json
+|-- README.md
+
+
