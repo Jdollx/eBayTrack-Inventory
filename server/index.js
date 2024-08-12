@@ -37,19 +37,17 @@ app.get("/models", async(req,res) => {
         const allModels = await pool.query(
             "SELECT * FROM model_inventory"
         );
-
         res.json(allModels.rows);
-        
     } catch (error) {
         console.error(error.message);
         
     }
-})
+});
 
 // get a specific model inventory
-// takes the search and queries it
 app.get("/models/:id", async(req,res) => {
     try {
+        // takes the inputted search and queries it
         const{id} = req.params;
         const oneModel = await pool.query(
             "SELECT * FROM model_inventory WHERE model_id = $1", 
@@ -60,11 +58,37 @@ app.get("/models/:id", async(req,res) => {
         console.error(error.message);
         
     }
-})
+});
 
 // update a model inventory
+app.put("/models/:id", async(req,res) => {
+    try {
+        const{id} = req.params;
+        const{model_name} = req.body;
+        const updateModel = await pool.query(
+            "UPDATE model_inventory SET model_name = $1 WHERE model_id = $2", 
+            [model_name, id]
+        );
+        res.json({ message: "Model was updated." });
+    } catch (error) {
+        console.error(error.message);
+    }
+});
 
 // delete/mark as sold model inventory
+app.delete("/models/:id", async(req,res) => {
+    try {
+        // specify what you want to delete via input
+        const{id} = req.params;
+        const deleteModel = await pool.query(
+            "DELETE FROM model_inventory WHERE model_id = $1",
+            [id]
+        );
+        res.json({ message: "Model was deleted."})
+    } catch (error) {
+        console.error(error.message);
+    }
+});
 
 // to start server with express, we need port
 // with confirmation it's started
