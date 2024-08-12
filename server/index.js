@@ -29,11 +29,38 @@ app.post("/models", async(req,res) => {
         console.error(error.message);
         
     }
-})
+});
 
 // get all model inventories
+app.get("/models", async(req,res) => {
+    try {
+        const allModels = await pool.query(
+            "SELECT * FROM model_inventory"
+        );
 
-// get a model inventory
+        res.json(allModels.rows);
+        
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+})
+
+// get a specific model inventory
+// takes the search and queries it
+app.get("/models/:id", async(req,res) => {
+    try {
+        const{id} = req.params;
+        const oneModel = await pool.query(
+            "SELECT * FROM model_inventory WHERE model_id = $1", 
+            [id]
+        );
+        res.json(oneModel.rows[0]);
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+})
 
 // update a model inventory
 

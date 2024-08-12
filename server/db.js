@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 
 // import Pool class from node-postgres to manage database connections
 const Pool = require("pg").Pool;
