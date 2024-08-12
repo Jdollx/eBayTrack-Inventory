@@ -13,6 +13,23 @@ app.use(express.json());
 // -- ROUTES (CRUD) -- 
 
 // create model inventory
+app.post("/models", async(req,res) => {
+    try {
+        // get model name data from client side via express.json
+        const { model_name } = req.body;
+        // insert new model name into the database
+        const newModel = await pool.query(
+            "INSERT INTO model_inventory (model_name) VALUES ($1) RETURNING *", 
+            [model_name]
+        );
+        // return the row of the most recently inserted
+        res.json(newModel.rows[0]);
+
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+})
 
 // get all model inventories
 
