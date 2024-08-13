@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, { useState } from "react";
 
 const AddModels = () => {
     // initiates input to empty string
@@ -16,7 +16,7 @@ const AddModels = () => {
             body: JSON.stringify(body)
         });
 
-        console.log(response);
+        window.location = "/";
         } catch (error) {
             console.error(error.Message)
             
@@ -25,7 +25,7 @@ const AddModels = () => {
 
 
     return (
-      <Fragment>
+      <>
           {/* Title */}
           <div className="flex justify-center mt-16">
               <h1 className="text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl text-center">
@@ -76,7 +76,7 @@ const AddModels = () => {
                   </button>
               </div>
           </form>
-      </Fragment>
+      </>
   );
 };
 

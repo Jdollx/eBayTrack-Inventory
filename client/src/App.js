@@ -1,18 +1,22 @@
 import logo from './logo.svg';
 import './App.css';
-import { Fragment } from 'react';
+import React from 'react';
 
 // components
-import SearchModels from './components/SearchModels';
+import AddModels from './components/AddModels';
+import ListModels from './components/ListModels';
 
 
 function App() {
   return (
-<Fragment>
+<>
   <div className="containter">
-    <SearchModels />
+    <AddModels />
   </div>
-</Fragment>
+  <div className="container">
+    <ListModels />
+  </div>
+</>
 )};
 
 export default App;
