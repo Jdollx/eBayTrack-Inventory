@@ -9,7 +9,7 @@ import SearchModels from './components/SearchModels';
 function App() {
   return (
 <Fragment>
-  <div className="">
+  <div className="containter">
     <SearchModels />
   </div>
 </Fragment>
