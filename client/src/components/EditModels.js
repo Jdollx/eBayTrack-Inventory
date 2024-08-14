@@ -1,24 +1,34 @@
 import React, { useState, useEffect } from "react";
 
-const EditModels = ({ model, closeModal, onSave }) => {
-  const [localModel, setLocalModel] = useState(model);
+const EditModels = ({ model: initialModel, closeModal, onSave }) => {
+  const [model, setModel] = useState(initialModel.model_name);
 
   useEffect(() => {
-    setLocalModel(model);
-  }, [model]);
+    setModel(initialModel.model_name);
+  }, [initialModel]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLocalModel((prevModel) => ({
-      ...prevModel,
-      [name]: value,
-    }));
+  const updateModel = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/models/${initialModel.model_id}`, {
+        method: "PUT", 
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model_name: model,  // Update with the current state value
+        }),
+      });
+
+      onSave({ ...initialModel, model_name: model });
+      closeModal();
+    } catch (error) {
+      console.error(error.message);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(localModel); // Call the onSave function passed from the parent to update the model
-    closeModal();
+    updateModel();
   };
 
   return (
@@ -36,7 +46,7 @@ const EditModels = ({ model, closeModal, onSave }) => {
             {/* Modal header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 rounded-t">
               <h3 className="text-lg font-semibold text-gray-900">
-                Edit {localModel?.model_name}
+                Edit {model}
               </h3>
               <button
                 type="button"
@@ -66,19 +76,19 @@ const EditModels = ({ model, closeModal, onSave }) => {
               <div className="grid gap-4 mb-4 grid-cols-2">
                 <div className="col-span-2">
                   <label
-                    htmlFor="name"
+                    htmlFor={`model_name_${initialModel.model_id}`}  // Unique ID using model_id
                     className="block mb-2 text-sm font-medium text-gray-900"
                   >
                     Model Name
                   </label>
                   <input
                     type="text"
-                    name="model_name" // Ensure this matches your model property
-                    id="name"
+                    name="model_name"
+                    id={`model_name_${initialModel.model_id}`}  // Unique ID
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                     placeholder="Type product name"
-                    value={localModel?.model_name || ""}
-                    onChange={handleChange}
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
                     required
                   />
                 </div>

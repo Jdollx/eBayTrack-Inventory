@@ -17,6 +17,7 @@ const ListModels = () => {
     }
   };
 
+  // fetches models
   const getModels = async () => {
     try {
       const response = await fetch("http://localhost:3000/models");
@@ -31,6 +32,8 @@ const ListModels = () => {
     getModels();
   }, []);
 
+
+  // opens and closes edit modal
   const openModal = (model) => {
     setSelectedModel(model);
     setIsModalOpen(true);
