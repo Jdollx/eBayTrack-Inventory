@@ -64,10 +64,10 @@ app.get("/models/:id", async(req,res) => {
 app.put("/models/:id", async(req,res) => {
     try {
         const{id} = req.params;
-        const{model_name} = req.body;
+        const{model_name, model_image, quantity} = req.body;
         const updateModel = await pool.query(
-            "UPDATE model_inventory SET model_name = $1 WHERE model_id = $2", 
-            [model_name, id]
+            "UPDATE model_inventory SET model_name = $1, model_image = $2, quantity = $3 WHERE model_id = $4 RETURNING *",
+            [model_name, model_image, quantity, id]
         );
         res.json({ message: "Model was updated." });
     } catch (error) {
