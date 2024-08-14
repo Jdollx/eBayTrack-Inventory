@@ -96,12 +96,31 @@ app.post("/purchases", async(req,res) => {
         // get purchase data from client side via express.json
         const { model_id, purchase_date, purchase_price, quantity } = req.body;
         // insert new purchase data into the database
-        const newModel = await pool.query(
+        const newPurchase = await pool.query(
             "INSERT INTO purchase_data (model_id, purchase_date, purchase_price, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
             [model_id, purchase_date, purchase_price, quantity]
         );
         // return the row of the most recently inserted
-        res.json(newModel.rows[0]);
+        res.json(newPurchase.rows[0]);
+
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+});
+
+// create sale data
+app.post("/sales", async(req,res) => {
+    try {
+        // get purchase data from client side via express.json
+        const { model_id, sale_date, sale_price, quantity } = req.body;
+        // insert new purchase data into the database
+        const newSale = await pool.query(
+            "INSERT INTO sale_data (model_id, sale_date, sale_price, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
+            [model_id, sale_date, sale_price, quantity]
+        );
+        // return the row of the most recently inserted
+        res.json(newSale.rows[0]);
 
     } catch (error) {
         console.error(error.message);
