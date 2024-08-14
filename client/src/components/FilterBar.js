@@ -57,7 +57,7 @@ const FilterBar = () => {
 
                 {/* Gray row */}
                 <div className="text-start bg-gray-100 border-t border-gray-200 py-4 px-6 mt-4 w-full">
-                    <p className="menu-hover my-1 py-1 font-medium text-gray-500 inline-flex items-center">Filters |</p>
+                    <p className="my-1 py-1 font-medium text-gray-500 inline-flex items-center">Filters |</p>
                 </div>
             </div>
         </div>
