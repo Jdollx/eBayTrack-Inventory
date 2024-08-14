@@ -1,6 +1,8 @@
 -- Create the database
 CREATE DATABASE ebaytrack_inventory;
 
+\c ebaytrack_inventory
+
 -- Table to store model inventory details
 CREATE TABLE model_inventory (
     model_id SERIAL PRIMARY KEY,

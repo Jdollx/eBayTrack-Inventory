@@ -16,11 +16,11 @@ app.use(express.json());
 app.post("/models", async(req,res) => {
     try {
         // get model name data from client side via express.json
-        const { model_name } = req.body;
+        const { model_name, model_image, quantity } = req.body;
         // insert new model name into the database
         const newModel = await pool.query(
-            "INSERT INTO model_inventory (model_name) VALUES ($1) RETURNING *", 
-            [model_name]
+            "INSERT INTO model_inventory (model_name, model_image, quantity) VALUES ($1, $2, $3) RETURNING *", 
+            [model_name, model_image, quantity]
         );
         // return the row of the most recently inserted
         res.json(newModel.rows[0]);
