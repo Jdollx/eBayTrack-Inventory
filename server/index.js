@@ -128,6 +128,27 @@ app.post("/sales", async(req,res) => {
     }
 });
 
+// create transaction log
+app.post("/transactions", async(req,res) => {
+    try {
+        // get purchase data from client side via express.json
+        const { model_id, transaction_type, transaction_date, transaction_price, quantity, profit } = req.body;
+        // insert new purchase data into the database
+        const newTransaction = await pool.query(
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, quantity, profit) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            [model_id, transaction_type, transaction_date, transaction_price, quantity, profit]
+        );
+        // return the row of the most recently inserted
+        res.json(newTransaction.rows[0]);
+
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+});
+
+
+
 // to start server with express, we need port
 // with confirmation it's started
 app.listen(3000, () => {
