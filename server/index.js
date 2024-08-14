@@ -90,6 +90,25 @@ app.delete("/models/:id", async(req,res) => {
     }
 });
 
+// create purchase data
+app.post("/purchases", async(req,res) => {
+    try {
+        // get purchase data from client side via express.json
+        const { model_id, purchase_date, purchase_price, quantity } = req.body;
+        // insert new purchase data into the database
+        const newModel = await pool.query(
+            "INSERT INTO purchase_data (model_id, purchase_date, purchase_price, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
+            [model_id, purchase_date, purchase_price, quantity]
+        );
+        // return the row of the most recently inserted
+        res.json(newModel.rows[0]);
+
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+});
+
 // to start server with express, we need port
 // with confirmation it's started
 app.listen(3000, () => {
