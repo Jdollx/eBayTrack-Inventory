@@ -9,7 +9,7 @@ CREATE TABLE model_inventory (
     model_name VARCHAR(255) NOT NULL,
     model_image TEXT,
     model_color VARCHAR(255), 
-    quantity INT DEFAULT 0
+    model_quantity INT DEFAULT 0
 );
 
 -- Table to store purchase data
@@ -18,7 +18,7 @@ CREATE TABLE purchase_data (
     model_id INT REFERENCES model_inventory(model_id) ON DELETE CASCADE,
     purchase_date DATE,
     purchase_price DECIMAL(10,2),
-    quantity INT NOT NULL,
+    purchase_quantity INT NOT NULL,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE sale_data (
     model_id INT REFERENCES model_inventory(model_id) ON DELETE CASCADE,
     sale_date TIMESTAMP NOT NULL,
     sale_price DECIMAL(10,2) NOT NULL,
-    quantity INT NOT NULL,
+    sale_quantity INT NOT NULL,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
 
@@ -39,8 +39,8 @@ CREATE TABLE transactions_logs (
     transaction_type SMALLINT,
     transaction_date DATE,
     transaction_price DECIMAL(10,2),
-    quantity INT NOT NULL,
-    profit DECIMAL(10,2) DEFAULT 0.00,
+    transaction_quantity INT NOT NULL,
+    transaction_profit DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
 

@@ -6,6 +6,7 @@ import React from 'react';
 import AddModels from './components/AddModels';
 import ListModels from './components/ListModels';
 import FilterBar from './components/FilterBar';
+import SearchBar from './components/SearchBar';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <AddModels />
       </div>
       <div className="container mx-auto px-4">
+        <SearchBar />
         <FilterBar />
         <ListModels />
       </div>
