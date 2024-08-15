@@ -16,7 +16,7 @@ app.use(express.json());
 app.post("/models", async(req,res) => {
     try {
         // get model name data from client side via express.json
-        const { model_name, model_image, quantity } = req.body;
+        const { model_name, model_image, model_color, quantity } = req.body;
         // insert new model name into the database
         const newModel = await pool.query(
             "INSERT INTO model_inventory (model_name, model_image, model_color, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
@@ -112,9 +112,9 @@ app.post("/purchases", async(req,res) => {
 // create sale data
 app.post("/sales", async(req,res) => {
     try {
-        // get purchase data from client side via express.json
+        // get sale data from client side via express.json
         const { model_id, sale_date, sale_price, quantity } = req.body;
-        // insert new purchase data into the database
+        // insert new sale data into the database
         const newSale = await pool.query(
             "INSERT INTO sale_data (model_id, sale_date, sale_price, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
             [model_id, sale_date, sale_price, quantity]
@@ -131,9 +131,9 @@ app.post("/sales", async(req,res) => {
 // create transaction log
 app.post("/transactions", async(req,res) => {
     try {
-        // get purchase data from client side via express.json
+        // get tansaction log from client side via express.json
         const { model_id, transaction_type, transaction_date, transaction_price, quantity, profit } = req.body;
-        // insert new purchase data into the database
+        // insert new transaction log into the database
         const newTransaction = await pool.query(
             "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, quantity, profit) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
             [model_id, transaction_type, transaction_date, transaction_price, quantity, profit]
@@ -147,15 +147,15 @@ app.post("/transactions", async(req,res) => {
     }
 });
 
-// create tag
+// create tags (no model association)
 app.post("/tags", async(req,res) => {
     try {
-        // get purchase data from client side via express.json
-        const { tag_id, tag_name } = req.body;
-        // insert new purchase data into the database
+        // get tag from client side via express.json
+        const {tag_name } = req.body;
+        // insert new tag into the database
         const newTags = await pool.query(
-            "INSERT INTO tags (tag_id, tag_name) VALUES ($1, $2) RETURNING *",
-            [tag_id, tag_name]
+            "INSERT INTO tags (tag_name) VALUES ($1) RETURNING *",
+            [tag_name]
         );
         // return the row of the most recently inserted
         res.json(newTags.rows[0]);
@@ -165,6 +165,23 @@ app.post("/tags", async(req,res) => {
         
     }
 });
+
+// create association between tags and models via ids
+app.post("/models/:id/tags", async (req, res) => {
+    try {
+        const { id } = req.params; // model_id
+        const { tag_id} = req.body;
+        const newAssociation = await pool.query(
+            "INSERT INTO model_tags (model_id, tag_id) VALUES ($1, $2) RETURNING *",
+            [id, tag_id]
+        );
+        res.json(newAssociation.rows[0]);
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+});
+
 
 
 // to start server with express, we need port
