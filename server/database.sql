@@ -8,6 +8,7 @@ CREATE TABLE model_inventory (
     model_id SERIAL PRIMARY KEY,
     model_name VARCHAR(255) NOT NULL,
     model_image TEXT,
+    model_color VARCHAR(255), 
     quantity INT DEFAULT 0
 );
 
