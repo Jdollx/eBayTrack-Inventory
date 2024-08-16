@@ -67,11 +67,25 @@ const ListModels = () => {
       <ul id="model-list" className="flex flex-wrap justify-center gap-10 w-full">
         {models.map((model) => (
           <li key={model.model_id} className="flex flex-col p-4 border rounded shadow-md w-64">
-            <img
-              src={model.imageUrl}
-              alt={model.model_name}
-              className="w-full h-32 object-cover mb-4"
-            />
+            {/* Conditionally render the image or a placeholder */}
+            {model.model_image ? (
+              <img
+                src={`http://localhost:3000${model.model_image}`}
+                alt={model.model_name}
+                className="w-full h-52 object-cover mb-4 rounded-lg"
+              />
+            ) : (
+              <div className="w-full h-52 bg-gray-200 flex items-center justify-center mb-4 rounded-lg">
+                <span className="text-gray-500">No Image Available</span>
+              </div>
+            )}
+            
+
+
+
+
+
+            {/* card text with info */}
             <h3 className="text-left text-lg font-semibold mb-2">{model.model_name}</h3>
             <p className="text-left">Quantity: {model.model_quantity}</p>
             <p className="text-left">Tags: {model.tags}</p>

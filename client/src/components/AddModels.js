@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 
 const AddModels = () => {
-  // Initiate state with empty strings
   const [model_name, setModel_Name] = useState("");
-  const [model_image, setModelImage] = useState("");
+  const [model_image, setModelImage] = useState(null);
   const [model_color, setModel_Color] = useState("");
   const [model_quantity, setModel_Quantity] = useState("");
   const [purchase_date, setPurchaseDate] = useState("");
@@ -16,24 +15,23 @@ const AddModels = () => {
 
   const AddNewModels = async () => {
     try {
-      const body = {
-        model_name,
-        model_image,
-        model_color,
-        model_quantity,
-        purchase_date,
-        purchase_price,
-        purchase_quantity,
-        sale_date,
-        sale_price,
-        sale_quantity,
-        tags,
-      };
+      // Use FormData to send the image file and other data
+      const formData = new FormData();
+      formData.append("model_name", model_name);
+      formData.append("model_image", model_image);
+      formData.append("model_color", model_color);
+      formData.append("model_quantity", model_quantity);
+      formData.append("purchase_date", purchase_date);
+      formData.append("purchase_price", purchase_price);
+      formData.append("purchase_quantity", purchase_quantity);
+      formData.append("sale_date", sale_date);
+      formData.append("sale_price", sale_price);
+      formData.append("sale_quantity", sale_quantity);
+      formData.append("tags", tags);
 
       const response = await fetch("http://localhost:3000/models", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: formData,
       });
 
       const newModel = await response.json();
@@ -65,6 +63,7 @@ const AddModels = () => {
 
   return (
     <>
+      {/* Add New Model Button */}
       <div className="fixed top-4 right-4 z-50">
         <button
           className="px-4 py-2 bg-gray-400 text-white rounded"
@@ -73,7 +72,7 @@ const AddModels = () => {
           Add New Model
         </button>
       </div>
-  
+
       {isModalOpen && (
         <div
           id="crud-modal"
@@ -110,30 +109,37 @@ const AddModels = () => {
                   <span className="sr-only">Close modal</span>
                 </button>
               </div>
-  
-              {/* Add Model */}
-              <form className="p-6" onSubmit={HandleSubmit}>
+
+              {/* Add Model Modal */}
+              <form className="p-6" onSubmit={HandleSubmit} encType="multipart/form-data">
                 <div className="flex gap-4 mb-4">
                   <div className="flex flex-col items-center w-1/3">
+                    {/* Conditional rendering for image existence */}
                     {model_image ? (
                       <img
-                        src={model_image}
+                        src={URL.createObjectURL(model_image)}
                         alt="Model"
                         className="object-cover w-full h-40 rounded-lg"
                       />
                     ) : (
-                      <div className="flex items-center justify-center w-full h-40 bg-gray-200 rounded-lg">
+                      <div className="flex items-center justify-center w-full h-52 bg-gray-200 rounded-lg">
                         <span className="text-gray-500">No photo available</span>
                       </div>
                     )}
                     <input
-                      className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 mt-2"
+                      className="block w-full text-sm text-gray-900 border border-gray-300 rounded-sm cursor-pointer bg-gray-50 mt-2"
                       id="file_input"
+                      accept="image/*"
                       type="file"
-                      onChange={(e) => setModelImage(e.target.files[0])}
+                      onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                          setModelImage(e.target.files[0]);
+                        }
+                      }}
                     />
                   </div>
-  
+
+                  {/* Model Name Input */}
                   <div className="flex flex-col w-2/3">
                     <div className="mb-4">
                       <label
@@ -146,13 +152,14 @@ const AddModels = () => {
                         type="text"
                         id="model_name"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                        placeholder="Type product name"
+                        placeholder="Type model name"
                         value={model_name}
                         onChange={(e) => setModel_Name(e.target.value)}
                         required
                       />
                     </div>
-  
+
+                    {/* Quantity Input */}
                     <div>
                       <label
                         htmlFor="quantity-input"
@@ -173,7 +180,7 @@ const AddModels = () => {
                     </div>
                   </div>
                 </div>
-  
+
                 <button
                   type="submit"
                   className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
@@ -199,6 +206,6 @@ const AddModels = () => {
       )}
     </>
   );
-};  
+};
 
 export default AddModels;
