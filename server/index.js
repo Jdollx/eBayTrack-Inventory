@@ -16,11 +16,11 @@ app.use(express.json());
 app.post("/models", async(req,res) => {
     try {
         // get model name data from client side via express.json
-        const { model_name, model_image, model_color, quantity } = req.body;
+        const { model_name, model_image, model_color, model_quantity } = req.body;
         // insert new model name into the database
         const newModel = await pool.query(
-            "INSERT INTO model_inventory (model_name, model_image, model_color, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
-            [model_name, model_image, model_color, quantity]
+            "INSERT INTO model_inventory (model_name, model_image, model_color, model_quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
+            [model_name, model_image, model_color, model_quantity]
         );
         // return the row of the most recently inserted
         res.json(newModel.rows[0]);
@@ -64,10 +64,10 @@ app.get("/models/:id", async(req,res) => {
 app.put("/models/:id", async(req,res) => {
     try {
         const{id} = req.params;
-        const{model_name, model_image, quantity} = req.body;
+        const{model_name, model_image, model_quantity} = req.body;
         const updateModel = await pool.query(
-            "UPDATE model_inventory SET model_name = $1, model_image = $2, quantity = $3 WHERE model_id = $4 RETURNING *",
-            [model_name, model_image, quantity, id]
+            "UPDATE model_inventory SET model_name = $1, model_image = $2, model_quantity = $3 WHERE model_id = $4 RETURNING *",
+            [model_name, model_image, model_quantity, id]
         );
         res.json({ message: "Model was updated." });
     } catch (error) {
@@ -94,11 +94,11 @@ app.delete("/models/:id", async(req,res) => {
 app.post("/purchases", async(req,res) => {
     try {
         // get purchase data from client side via express.json
-        const { model_id, purchase_date, purchase_price, quantity } = req.body;
+        const { model_id, purchase_date, purchase_price, purchase_quantity } = req.body;
         // insert new purchase data into the database
         const newPurchase = await pool.query(
-            "INSERT INTO purchase_data (model_id, purchase_date, purchase_price, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
-            [model_id, purchase_date, purchase_price, quantity]
+            "INSERT INTO purchase_data (model_id, purchase_date, purchase_price, purchase_quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
+            [model_id, purchase_date, purchase_price, purchase_quantity]
         );
         // return the row of the most recently inserted
         res.json(newPurchase.rows[0]);
@@ -113,11 +113,11 @@ app.post("/purchases", async(req,res) => {
 app.post("/sales", async(req,res) => {
     try {
         // get sale data from client side via express.json
-        const { model_id, sale_date, sale_price, quantity } = req.body;
+        const { model_id, sale_date, sale_price, sale_quantity } = req.body;
         // insert new sale data into the database
         const newSale = await pool.query(
             "INSERT INTO sale_data (model_id, sale_date, sale_price, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
-            [model_id, sale_date, sale_price, quantity]
+            [model_id, sale_date, sale_price, sale_quantity]
         );
         // return the row of the most recently inserted
         res.json(newSale.rows[0]);
@@ -132,11 +132,11 @@ app.post("/sales", async(req,res) => {
 app.post("/transactions", async(req,res) => {
     try {
         // get tansaction log from client side via express.json
-        const { model_id, transaction_type, transaction_date, transaction_price, quantity, profit } = req.body;
+        const { model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit } = req.body;
         // insert new transaction log into the database
         const newTransaction = await pool.query(
-            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, quantity, profit) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-            [model_id, transaction_type, transaction_date, transaction_price, quantity, profit]
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+            [model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit]
         );
         // return the row of the most recently inserted
         res.json(newTransaction.rows[0]);

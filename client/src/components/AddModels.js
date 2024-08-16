@@ -114,27 +114,51 @@ const AddModels = () => {
                 </button>
               </div>
 
-              <form className="p-4" onSubmit={HandleSubmit}>
+            {/*MODEL NAME INPUT*/}
+            <form className="p-4" onSubmit={HandleSubmit}>
                 <div className="grid gap-4 mb-4 grid-cols-2">
-                  <div className="col-span-2">
+                    {/* Model Name Input */}
+                    <div className="col-span-2">
                     <label
-                      htmlFor="model_name"
-                      className="block mb-2 text-sm font-medium text-gray-900"
+                        htmlFor="model_name"
+                        className="block mb-2 text-sm font-medium text-gray-900"
                     >
-                      Model Name 
+                        Model Name:
                     </label>
                     <input
-                      type="text"
-                      id="model_name"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                      placeholder="Type product name"
-                      value={model_name}
-                      onChange={(e) => setModel_Name(e.target.value)}
-                      required
+                        type="text"
+                        id="model_name"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type product name"
+                        value={model_name}
+                        onChange={(e) => setModel_Name(e.target.value)}
+                        required
                     />
-                  </div>
-                  {/* Add other input fields here */}
+                    </div>
+
+                    {/* Quantity Input */}
+                    <div className="col-span-2">
+                    <label
+                        htmlFor="quantity-input"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                    >
+                        Quantity:
+                    </label>
+                    <input
+                        type="number"
+                        id="quantity-input"
+                        aria-describedby="helper-text-explanation"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        placeholder="90210"
+                        value={model_quantity}
+                        onChange={(e) => setModel_Quantity(e.target.value)}
+                        required
+                    />
+                    </div>
                 </div>
+
+
+
 
                 <button
                   type="submit"

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import EditModels from "./EditModels";
+import AddModels from "./AddModels";
 
 const ListModels = () => {
   const [models, setModels] = useState([]);
@@ -72,7 +73,7 @@ const ListModels = () => {
               className="w-full h-32 object-cover mb-4"
             />
             <h3 className="text-left text-lg font-semibold mb-2">{model.model_name}</h3>
-            <p className="text-left">Quantity: {model.quantity}</p>
+            <p className="text-left">Quantity: {model.model_quantity}</p>
             <p className="text-left">Tags: {model.tags}</p>
             <div className="flex gap-2 mt-4">
               <button className="bg-green-500 text-white px-4 py-2 rounded">Logs</button>
