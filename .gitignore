@@ -1,4 +1,4 @@
 *.env
-eBayTrack-Inventory/images/*
+server/images
 
 
