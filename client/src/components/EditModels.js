@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 
 const EditModels = ({ model: initialModel, closeModal, onSave }) => {
+  // taking the initial model as the default
   const [model, setModel] = useState(initialModel.model_name);
 
+  // handles when the initial model is changed
   useEffect(() => {
     setModel(initialModel.model_name);
   }, [initialModel]);
 
+  // sends put request to update the initial model info in server
   const updateModel = async () => {
     try {
       const response = await fetch(`http://localhost:3000/models/${initialModel.model_id}`, {

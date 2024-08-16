@@ -14,6 +14,7 @@ function App() {
       <div className="container mx-auto px-4">
         <AddModels />
       </div>
+      
       <div className="container mx-auto px-4">
         <SearchBar />
         <FilterBar />
