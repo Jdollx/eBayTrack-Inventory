@@ -39,26 +39,38 @@ app.use(express.json());
 
 // -- ROUTES (CRUD) -- 
 
-// create model inventory
-app.post("/models", upload.single('model_image'), async(req,res) => {
+app.post("/models", upload.single('model_image'), async (req, res) => {
     try {
-        // get model name data from client side via express.json
-        const { model_name, model_color, model_quantity } = req.body;
+        // Get model data from client side
+        const { model_name, model_color, model_quantity, purchase_date } = req.body;
         const model_image = req.file ? `/images/${req.file.filename}` : null;
         console.log('Model Image:', model_image);
-        // insert new model name into the database
+
+        // Insert new model into the database
         const newModel = await pool.query(
             "INSERT INTO model_inventory (model_name, model_image, model_color, model_quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
             [model_name, model_image, model_color, model_quantity]
         );
-        // return the row of the most recently inserted
+
+        const modelId = newModel.rows[0].model_id;
+
+        // Insert purchase data into the purchase_data table
+        if (purchase_date) {
+            await pool.query(
+                "INSERT INTO purchase_data (model_id, purchase_date) VALUES ($1, $2)", 
+                [modelId, purchase_date]
+            );
+        }
+
+        // Return the newly inserted model
         res.json(newModel.rows[0]);
 
     } catch (error) {
         console.error(error.message);
-        
+        res.status(500).send("Server error");
     }
 });
+
 
 // get all model inventories
 app.get("/models", async(req,res) => {
@@ -122,11 +134,13 @@ app.delete("/models/:id", async(req,res) => {
 app.post('/purchases', async (req, res) => {
     console.log('Request body:', req.body);
     try {
-        const { model_id, purchase_date, purchase_price } = req.body;
+        let { model_id, purchase_date, purchase_price } = req.body;
+
         if (!model_id || !purchase_date || !purchase_price) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
+        // Here, purchase_date should already be in the correct format (yyyy-mm-dd)
         const result = await pool.query(
             'INSERT INTO purchase_data (model_id, purchase_date, purchase_price) VALUES ($1, $2, $3) RETURNING *',
             [model_id, purchase_date, purchase_price]
@@ -134,8 +148,8 @@ app.post('/purchases', async (req, res) => {
 
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ error: 'Server Error' });
+        console.error('Error inserting purchase:', error);
+        res.status(500).json({ error: 'Server Error', details: error.message });
     }
 });
 

@@ -1,24 +1,25 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const AddModels = () => {
-  const [model_name, setModel_Name] = useState("");
+  const [model_name, setModel_Name] = useState('');
   const [model_image, setModelImage] = useState(null);
-  const [model_color, setModel_Color] = useState("");
-  const [model_quantity, setModel_Quantity] = useState("");
-  const [purchase_date, setPurchaseDate] = useState("");  // Only purchase date
-  const [tags, setTags] = useState("");
+  const [model_color, setModelColor] = useState('');
+  const [model_quantity, setModel_Quantity] = useState('');
+  const [purchase_date, setPurchaseDate] = useState('');
+  const [tags, setTags] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      // Step 1: Add the new model
+      // Step 1: Add the new model with purchase date
       const formData = new FormData();
       formData.append("model_name", model_name);
       formData.append("model_image", model_image);
       formData.append("model_color", model_color);
       formData.append("model_quantity", model_quantity);
+      formData.append("purchase_date", purchase_date);  // Include purchase date
       formData.append("tags", tags);
 
       const modelResponse = await fetch("http://localhost:3000/models", {
@@ -27,24 +28,9 @@ const AddModels = () => {
       });
 
       const newModel = await modelResponse.json();
-      const modelId = newModel.model_id;
 
-      if (!modelId) {
+      if (!newModel.model_id) {
         throw new Error("Failed to create model");
-      }
-
-      // Step 2: Add purchase data
-      if (purchase_date) {
-        const purchaseResponse = await fetch("http://localhost:3000/purchases", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model_id: modelId,
-            purchase_date,
-          }),
-        });
-
-        await purchaseResponse.json();
       }
 
       // After successful submission
