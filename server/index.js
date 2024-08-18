@@ -73,17 +73,20 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
 
 
 // get all model inventories
-app.get("/models", async(req,res) => {
+app.get("/models", async (req, res) => {
     try {
         const allModels = await pool.query(
-            "SELECT * FROM model_inventory"
+            `SELECT mi.*, pd.purchase_date 
+             FROM model_inventory mi 
+             LEFT JOIN purchase_data pd ON mi.model_id = pd.model_id`
         );
         res.json(allModels.rows);
     } catch (error) {
         console.error(error.message);
-        
+        res.status(500).send("Server error");
     }
 });
+
 
 // get a specific model inventory
 app.get("/models/:id", async(req,res) => {

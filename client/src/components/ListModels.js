@@ -7,6 +7,15 @@ const ListModels = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState(null);
 
+  // Function to format date as mm/dd/yyyy
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${month}/${day}/${year}`;
+  };
+
   const deleteModel = async (id) => {
     try {
       await fetch(`http://localhost:3000/models/${id}`, {
@@ -88,7 +97,7 @@ const ListModels = () => {
             {/* card text with info */}
             <h3 className="text-left text-lg font-semibold mb-2">{model.model_name}</h3>
             <p className="text-left">Quantity: {model.model_quantity}</p>
-            <p className="text-left">Tags: {model.tags}</p>
+            <p className="text-left">Purchase Date: {formatDate(model.purchase_date)}</p>
             <div className="flex gap-2 mt-4">
               <button className="bg-green-500 text-white px-4 py-2 rounded">Logs</button>
               <button

@@ -19,7 +19,8 @@ const AddModels = () => {
       formData.append("model_image", model_image);
       formData.append("model_color", model_color);
       formData.append("model_quantity", model_quantity);
-      formData.append("purchase_date", purchase_date);  // Include purchase date
+      formData.append("purchase_date", purchase_date);
+      formData.append("purchase_price", purchase_price);
       formData.append("tags", tags);
 
       const modelResponse = await fetch("http://localhost:3000/models", {
