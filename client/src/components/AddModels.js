@@ -5,37 +5,49 @@ const AddModels = () => {
   const [model_image, setModelImage] = useState(null);
   const [model_color, setModel_Color] = useState("");
   const [model_quantity, setModel_Quantity] = useState("");
-  const [purchase_date, setPurchaseDate] = useState("");
-  const [purchase_price, setPurchasePrice] = useState("");
-  const [purchase_quantity, setPurchaseQuantity] = useState("");
-  const [sale_date, setSaleDate] = useState("");
-  const [sale_price, setSalePrice] = useState("");
-  const [sale_quantity, setSaleQuantity] = useState("");
+  const [purchase_date, setPurchaseDate] = useState("");  // Only purchase date
   const [tags, setTags] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const AddNewModels = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
     try {
-      // Use FormData to send the image file and other data
+      // Step 1: Add the new model
       const formData = new FormData();
       formData.append("model_name", model_name);
       formData.append("model_image", model_image);
       formData.append("model_color", model_color);
       formData.append("model_quantity", model_quantity);
-      formData.append("purchase_date", purchase_date);
-      formData.append("purchase_price", purchase_price);
-      formData.append("purchase_quantity", purchase_quantity);
-      formData.append("sale_date", sale_date);
-      formData.append("sale_price", sale_price);
-      formData.append("sale_quantity", sale_quantity);
       formData.append("tags", tags);
 
-      const response = await fetch("http://localhost:3000/models", {
+      const modelResponse = await fetch("http://localhost:3000/models", {
         method: "POST",
         body: formData,
       });
 
-      const newModel = await response.json();
-      console.log("Model saved:", newModel);
+      const newModel = await modelResponse.json();
+      const modelId = newModel.model_id;
+
+      if (!modelId) {
+        throw new Error("Failed to create model");
+      }
+
+      // Step 2: Add purchase data
+      if (purchase_date) {
+        const purchaseResponse = await fetch("http://localhost:3000/purchases", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model_id: modelId,
+            purchase_date,
+          }),
+        });
+
+        await purchaseResponse.json();
+      }
+
+      // After successful submission
       closeModal();
       window.location = "/";
     } catch (error) {
@@ -43,27 +55,16 @@ const AddModels = () => {
     }
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState(null);
-
-  const openModal = (model) => {
-    setSelectedModel(model);
+  const openModal = () => {
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedModel(null);
-  };
-
-  const HandleSubmit = (e) => {
-    e.preventDefault();
-    AddNewModels();
   };
 
   return (
     <>
-      {/* Add New Model Button */}
       <div className="fixed top-4 right-4 z-50">
         <button
           className="px-4 py-2 bg-gray-400 text-white rounded"
@@ -110,11 +111,13 @@ const AddModels = () => {
                 </button>
               </div>
 
-              {/* Add Model Modal */}
-              <form className="p-6" onSubmit={HandleSubmit} encType="multipart/form-data">
+              <form
+                className="p-6"
+                onSubmit={handleSubmit}
+                encType="multipart/form-data"
+              >
                 <div className="flex gap-4 mb-4">
                   <div className="flex flex-col items-center w-1/3">
-                    {/* Conditional rendering for image existence */}
                     {model_image ? (
                       <img
                         src={URL.createObjectURL(model_image)}
@@ -123,7 +126,9 @@ const AddModels = () => {
                       />
                     ) : (
                       <div className="flex items-center justify-center w-full h-52 bg-gray-200 rounded-lg">
-                        <span className="text-gray-500">No photo available</span>
+                        <span className="text-gray-500">
+                          No photo available
+                        </span>
                       </div>
                     )}
                     <input
@@ -139,7 +144,6 @@ const AddModels = () => {
                     />
                   </div>
 
-                  {/* Model Name Input */}
                   <div className="flex flex-col w-2/3">
                     <div className="mb-4">
                       <label
@@ -159,8 +163,7 @@ const AddModels = () => {
                       />
                     </div>
 
-                    {/* Quantity Input */}
-                    <div>
+                    <div className="mb-4">
                       <label
                         htmlFor="quantity-input"
                         className="block mb-2 text-sm font-medium text-gray-900"
@@ -170,7 +173,6 @@ const AddModels = () => {
                       <input
                         type="number"
                         id="quantity-input"
-                        aria-describedby="helper-text-explanation"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="Enter quantity"
                         value={model_quantity}
@@ -178,11 +180,25 @@ const AddModels = () => {
                         required
                       />
                     </div>
+
+                    <div className="mb-4">
+                      <label
+                        htmlFor="purchase-date"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Purchase Date:
+                      </label>
+                      <input
+                        type="date"
+                        id="purchase-date"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        value={purchase_date}
+                        onChange={(e) => setPurchaseDate(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-                
-
-                
 
                 <button
                   type="submit"

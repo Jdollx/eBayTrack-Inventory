@@ -119,22 +119,34 @@ app.delete("/models/:id", async(req,res) => {
     }
 });
 
-// create purchase data
-app.post("/purchases", async(req,res) => {
+app.post('/purchases', async (req, res) => {
+    console.log('Request body:', req.body);
     try {
-        // get purchase data from client side via express.json
-        const { model_id, purchase_date, purchase_price, purchase_quantity } = req.body;
-        // insert new purchase data into the database
-        const newPurchase = await pool.query(
-            "INSERT INTO purchase_data (model_id, purchase_date, purchase_price, purchase_quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
-            [model_id, purchase_date, purchase_price, purchase_quantity]
-        );
-        // return the row of the most recently inserted
-        res.json(newPurchase.rows[0]);
+        const { model_id, purchase_date, purchase_price } = req.body;
+        if (!model_id || !purchase_date || !purchase_price) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
 
+        const result = await pool.query(
+            'INSERT INTO purchase_data (model_id, purchase_date, purchase_price) VALUES ($1, $2, $3) RETURNING *',
+            [model_id, purchase_date, purchase_price]
+        );
+
+        res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error(error.message);
-        
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+// get a specific model inventory
+app.get("/purchases", async (req, res) => {
+    try {
+        const allPurchases = await pool.query("SELECT * FROM purchase_data"); // Fixed table name
+        res.json(allPurchases.rows);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Server Error' });
     }
 });
 
@@ -142,11 +154,11 @@ app.post("/purchases", async(req,res) => {
 app.post("/sales", async(req,res) => {
     try {
         // get sale data from client side via express.json
-        const { model_id, sale_date, sale_price, sale_quantity } = req.body;
+        const { model_id, sale_date, sale_price } = req.body;
         // insert new sale data into the database
         const newSale = await pool.query(
-            "INSERT INTO sale_data (model_id, sale_date, sale_price, quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
-            [model_id, sale_date, sale_price, sale_quantity]
+            "INSERT INTO sale_data (model_id, sale_date, sale_price) VALUES ($1, $2, $3) RETURNING *", 
+            [model_id, sale_date, sale_price]
         );
         // return the row of the most recently inserted
         res.json(newSale.rows[0]);

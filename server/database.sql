@@ -18,7 +18,6 @@ CREATE TABLE purchase_data (
     model_id INT REFERENCES model_inventory(model_id) ON DELETE CASCADE,
     purchase_date DATE,
     purchase_price DECIMAL(10,2),
-    purchase_quantity INT NOT NULL,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
 
@@ -28,7 +27,6 @@ CREATE TABLE sale_data (
     model_id INT REFERENCES model_inventory(model_id) ON DELETE CASCADE,
     sale_date TIMESTAMP NOT NULL,
     sale_price DECIMAL(10,2) NOT NULL,
-    sale_quantity INT NOT NULL,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
 
