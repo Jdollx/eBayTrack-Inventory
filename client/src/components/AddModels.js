@@ -7,6 +7,8 @@ const AddModels = () => {
   const [model_quantity, setModel_Quantity] = useState('');
   const [purchase_date, setPurchase_Date] = useState('');
   const [purchase_price, setPurchase_Price] = useState('');
+  const [sale_date, setSale_Date] = useState('');
+  const [sale_price, setSale_Price] = useState('');
   const [tags, setTags] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -22,6 +24,8 @@ const AddModels = () => {
       formData.append("model_quantity", model_quantity);
       formData.append("purchase_date", purchase_date);
       formData.append("purchase_price", purchase_price);
+      formData.append("sale_date", sale_date);
+      formData.append("sale_price", sale_price);
       formData.append("tags", tags);
 
       const modelResponse = await fetch("http://localhost:3000/models", {
@@ -61,7 +65,7 @@ const AddModels = () => {
           Add New Model
         </button>
       </div>
-
+  
       {isModalOpen && (
         <div
           id="crud-modal"
@@ -98,7 +102,7 @@ const AddModels = () => {
                   <span className="sr-only">Close modal</span>
                 </button>
               </div>
-
+  
               <form
                 className="p-6"
                 onSubmit={handleSubmit}
@@ -131,7 +135,7 @@ const AddModels = () => {
                       }}
                     />
                   </div>
-
+  
                   <div className="flex flex-col w-2/3">
                     <div className="mb-4">
                       <label
@@ -150,9 +154,7 @@ const AddModels = () => {
                         required
                       />
                     </div>
-
-
-
+  
                     <div className="mb-4">
                       <label
                         htmlFor="quantity-input"
@@ -170,9 +172,7 @@ const AddModels = () => {
                         required
                       />
                     </div>
-
-
-                    
+  
                     <div className="mb-4">
                       <label
                         htmlFor="purchase-date"
@@ -189,30 +189,64 @@ const AddModels = () => {
                         required
                       />
                     </div>
+  
+                    <div className="mb-4">
+                      <label
+                        htmlFor="purchase_price"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Purchase Price:
+                      </label>
+                      <input
+                        type="number"
+                        id="purchase_price"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="0.00"
+                        step="0.01"
+                        value={purchase_price}
+                        onChange={(e) => setPurchase_Price(e.target.value)}
+                        required
+                      />
+                    </div>
+  
+                    <div className="mb-4">
+                      <label
+                        htmlFor="sale-date"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Sale Date:
+                      </label>
+                      <input
+                        type="date"
+                        id="sale-date"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        value={sale_date}
+                        onChange={(e) => setSale_Date(e.target.value)}
+                        required
+                      />
+                    </div>
+  
+                    <div className="mb-4">
+                      <label
+                        htmlFor="sale_price"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Sale Price:
+                      </label>
+                      <input
+                        type="number"
+                        id="sale_price"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="0.00"
+                        step="0.01"
+                        value={sale_price}
+                        onChange={(e) => setSale_Price(e.target.value)}
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
-
-
-                <div className="mb-4">
-                    <label
-                    htmlFor="model_name"
-                    className="block mb-2 text-sm font-medium text-gray-900"
-                    >
-                    Purchase Price:
-                    </label>
-                    <input
-                    type="number"
-                    id="purchase_price"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                    placeholder="0.00"
-                    step="0.01"
-                    value={purchase_price}
-                    onChange={(e) => setPurchase_Price(e.target.value)}
-                    required
-                    />
-                </div>
-
-
+  
                 <button
                   type="submit"
                   className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
@@ -238,6 +272,5 @@ const AddModels = () => {
       )}
     </>
   );
-};
-
+}
 export default AddModels;

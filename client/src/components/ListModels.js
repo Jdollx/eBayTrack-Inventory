@@ -99,6 +99,8 @@ const ListModels = () => {
             <p className="text-left">Quantity: {model.model_quantity}</p>
             <p className="text-left">Purchase Date: {formatDate(model.purchase_date)}</p>
             <p className="text-left">Purchase Price: ${model.purchase_price}</p>
+            <p className="text-left">Sale Date: {formatDate(model.sale_date)}</p>
+            <p className="text-left">Sale Price: ${model.sale_price}</p>
             <div className="flex gap-2 mt-4">
               <button className="bg-green-500 text-white px-4 py-2 rounded">Logs</button>
               <button
