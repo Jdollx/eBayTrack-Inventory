@@ -5,7 +5,8 @@ const AddModels = () => {
   const [model_image, setModelImage] = useState(null);
   const [model_color, setModelColor] = useState('');
   const [model_quantity, setModel_Quantity] = useState('');
-  const [purchase_date, setPurchaseDate] = useState('');
+  const [purchase_date, setPurchase_Date] = useState('');
+  const [purchase_price, setPurchase_Price] = useState('');
   const [tags, setTags] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -150,6 +151,8 @@ const AddModels = () => {
                       />
                     </div>
 
+
+
                     <div className="mb-4">
                       <label
                         htmlFor="quantity-input"
@@ -168,6 +171,8 @@ const AddModels = () => {
                       />
                     </div>
 
+
+                    
                     <div className="mb-4">
                       <label
                         htmlFor="purchase-date"
@@ -180,12 +185,33 @@ const AddModels = () => {
                         id="purchase-date"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         value={purchase_date}
-                        onChange={(e) => setPurchaseDate(e.target.value)}
+                        onChange={(e) => setPurchase_Date(e.target.value)}
                         required
                       />
                     </div>
                   </div>
                 </div>
+
+
+                <div className="mb-4">
+                    <label
+                    htmlFor="model_name"
+                    className="block mb-2 text-sm font-medium text-gray-900"
+                    >
+                    Purchase Price:
+                    </label>
+                    <input
+                    type="number"
+                    id="purchase_price"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                    placeholder="0.00"
+                    step="0.01"
+                    value={purchase_price}
+                    onChange={(e) => setPurchase_Price(e.target.value)}
+                    required
+                    />
+                </div>
+
 
                 <button
                   type="submit"

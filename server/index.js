@@ -42,7 +42,7 @@ app.use(express.json());
 app.post("/models", upload.single('model_image'), async (req, res) => {
     try {
         // Get model data from client side
-        const { model_name, model_color, model_quantity, purchase_date } = req.body;
+        const { model_name, model_color, model_quantity, purchase_date, purchase_price } = req.body;
         const model_image = req.file ? `/images/${req.file.filename}` : null;
         console.log('Model Image:', model_image);
 
@@ -57,8 +57,8 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
         // Insert purchase data into the purchase_data table
         if (purchase_date) {
             await pool.query(
-                "INSERT INTO purchase_data (model_id, purchase_date) VALUES ($1, $2)", 
-                [modelId, purchase_date]
+                "INSERT INTO purchase_data (model_id, purchase_date, purchase_price) VALUES ($1, $2, $3)", 
+                [modelId, purchase_date, purchase_price]
             );
         }
 
@@ -76,9 +76,11 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
 app.get("/models", async (req, res) => {
     try {
         const allModels = await pool.query(
-            `SELECT mi.*, pd.purchase_date 
-             FROM model_inventory mi 
-             LEFT JOIN purchase_data pd ON mi.model_id = pd.model_id`
+            `SELECT mi.model_id, mi.model_name, mi.model_image, mi.model_color, mi.model_quantity,
+            pd.purchase_date, pd.purchase_price
+            FROM model_inventory mi
+            LEFT JOIN purchase_data pd ON mi.model_id = pd.model_id;
+            `
         );
         res.json(allModels.rows);
     } catch (error) {
