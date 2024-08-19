@@ -7,12 +7,14 @@ import AddModels from './components/AddModels';
 import ListModels from './components/ListModels';
 import FilterBar from './components/FilterBar';
 import SearchBar from './components/SearchBar';
+import TagsManager from './components/TagsManager';
 
 function App() {
   return (
     <>
       <div className="container mx-auto px-4">
         <AddModels />
+        <TagsManager />
       </div>
       
       <div className="container mx-auto px-4">

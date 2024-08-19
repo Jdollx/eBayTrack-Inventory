@@ -42,7 +42,7 @@ app.use(express.json());
 app.post("/models", upload.single('model_image'), async (req, res) => {
     try {
         // Get model data from client side
-        const { model_name, model_color, model_quantity, purchase_date, purchase_price, sale_date, sale_price } = req.body;
+        const { model_name, model_color, model_quantity, purchase_date, purchase_price, sale_date, sale_price, tag_name } = req.body;
         const model_image = req.file ? `/images/${req.file.filename}` : null;
         console.log('Model Image:', model_image);
 
@@ -69,6 +69,13 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
                 [modelId, sale_date, sale_price]
             );
         }
+        // insert into tags
+        if (tags) {
+            await pool.query(
+                "INSERT INTO tags (model_id, tag_name) VALUES ($1, $2)", 
+                [modelId, tag_name]
+            );
+        }
 
         // Return the newly inserted model
         res.json(newModel.rows[0]);
@@ -93,10 +100,14 @@ app.get("/models", async (req, res) => {
                 pd.purchase_date, 
                 pd.purchase_price,
                 sd.sale_date,
-                sd.sale_price
+                sd.sale_price,
+                t.tag_id,
+                t.tag_name
             FROM model_inventory mi
             LEFT JOIN purchase_data pd ON mi.model_id = pd.model_id
-            LEFT JOIN sale_data sd ON mi.model_id = sd.model_id;
+            LEFT JOIN sale_data sd ON mi.model_id = sd.model_id
+            LEFT JOIN model_tags mt ON mi.model_id = mt.model_id
+            LEFT JOIN tags t ON mt.tag_id = t.tag_id;
             `
         );
         res.json(allModels.rows);
