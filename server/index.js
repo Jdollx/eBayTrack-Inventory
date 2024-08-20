@@ -72,8 +72,8 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
         // insert into tags
         if (tags) {
             await pool.query(
-                "INSERT INTO tags (model_id, tag_name) VALUES ($1, $2)", 
-                [modelId, tag_name]
+                "INSERT INTO tags (tag_name) VALUES ($1)", 
+                [tag_name]
             );
         }
 
@@ -236,21 +236,21 @@ app.post("/transactions", async(req,res) => {
 });
 
 // create tags (no model association)
-app.post("/tags", async(req,res) => {
+app.post("/tags", async (req, res) => {
     try {
-        // get tag from client side via express.json
-        const {tag_name } = req.body;
-        // insert new tag into the database
+        const { tag_name } = req.body;
+        console.log("Received tag_name:", tag_name);
+
         const newTags = await pool.query(
             "INSERT INTO tags (tag_name) VALUES ($1) RETURNING *",
             [tag_name]
         );
-        // return the row of the most recently inserted
-        res.json(newTags.rows[0]);
 
+        console.log("Inserted tag:", newTags.rows[0]);
+        res.json(newTags.rows[0]);
     } catch (error) {
-        console.error(error.message);
-        
+        console.error("Error inserting tag:", error.message);
+        res.status(500).json({ error: 'An error occurred while creating the tag' });
     }
 });
 
