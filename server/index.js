@@ -254,6 +254,16 @@ app.post("/tags", async (req, res) => {
     }
 });
 
+app.get("/tags", async(req,res) => {
+    try {
+        const allTags = await pool.query("SELECT * FROM tags"); 
+        res.json(allTags.rows);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 // create association between tags and models via ids
 app.post("/models/:id/tags", async (req, res) => {
     try {

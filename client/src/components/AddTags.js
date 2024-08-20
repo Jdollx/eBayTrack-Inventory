@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const TagsManager = () => {
+const AddTags = () => {
     const [tag_name, setTagName] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -14,11 +14,11 @@ const TagsManager = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({
-                    tag_name: tag_name,  
-                  }),
-                });
+                },
+                body: JSON.stringify({
+                    tag_name: tag_name,
+                }),
+            });
 
             closeModal();
             window.location = '/';
@@ -55,26 +55,7 @@ const TagsManager = () => {
                 >
                     <div className="relative w-full max-w-3xl p-6 max-h-screen">
                         <div className="relative bg-white rounded-lg shadow-md flex h-full">
-                            {/* Left Column for Tags */}
-                            <div className="w-1/3 bg-gray-100 p-4 border-r border-gray-200 flex flex-col justify-between">
-                                <h4 className="text-md font-semibold text-gray-700 mb-4">Tags in Use</h4>
-                                <ul className="space-y-2">
-
-                                <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-blue-400 border border-blue-400">Default</span>
-                                <span className="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-gray-400 border border-gray-500">Dark</span>
-                                <span className="bg-red-100 text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-red-400 border border-red-400">Red</span>
-                                <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-green-400 border border-green-400">Green</span>
-                                <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-yellow-300 border border-yellow-300">Yellow</span>
-                                <span className="bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-indigo-400 border border-indigo-400">Indigo</span>
-                                <span className="bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-purple-400 border border-purple-400">Purple</span>
-                                <span className="bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-200 dark:text-pink-400 border border-pink-400">Pink</span>
-
-                                    {/* Add more tags as needed */}
-                                </ul>
-                            </div>
-
-                            {/* Right Column for Managing Tags */}
-                            <div className="w-2/3 p-4 flex flex-col justify-between">
+                            <div className="w-full p-4 flex flex-col justify-between">
                                 <div className="flex items-center justify-between mb-4">
                                     <h3 className="text-lg font-semibold text-gray-900">
                                         Tags Manager
@@ -136,4 +117,4 @@ const TagsManager = () => {
     );
 };
 
-export default TagsManager;
+export default AddTags;
