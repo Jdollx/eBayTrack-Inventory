@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const AddTags = () => {
     const [tag_name, setTagName] = useState('');
+    const [list_tags, setListTags] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSubmit = async (e) => {
@@ -19,13 +20,28 @@ const AddTags = () => {
                     tag_name: tag_name,
                 }),
             });
-
-            closeModal();
-            window.location = '/';
+            setTagName(''); // Clear the input field
+            getTags(); // list without refresh 
         } catch (error) {
             console.error(error.message);
         }
     };
+
+    const getTags = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/tags");
+            const jsonData = await response.json();
+            setListTags(jsonData);
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
+    useEffect(() => {
+        if (isModalOpen) {
+            getTags();  // Fetch tags when the modal is opened
+        }
+    }, [isModalOpen]);
 
     const openModal = () => {
         setIsModalOpen(true);
@@ -63,7 +79,7 @@ const AddTags = () => {
                                     <button
                                         type="button"
                                         className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
-                                        onClick={closeModal}
+                                        onClick={handleSubmit}
                                     >
                                         <svg
                                             className="w-3 h-3"
@@ -83,31 +99,49 @@ const AddTags = () => {
                                         <span className="sr-only">Close modal</span>
                                     </button>
                                 </div>
-                                <form className="flex flex-col" onSubmit={handleSubmit}>
-                                    <div className="mb-4">
-                                        <label
-                                            htmlFor="tag_name"
-                                            className="block mb-2 text-sm font-medium text-gray-900"
-                                        >
-                                            Tag Name:
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="tag_name"
-                                            value={tag_name}
-                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                                            placeholder="Type tag name"
-                                            onChange={(e) => setTagName(e.target.value)}
-                                            required
-                                        />
-                                    </div>
+                                
+                                {/* Add Tag Form */}
+                                <form className="flex items-center mb-4" onSubmit={handleSubmit}>
+                                    <input
+                                        type="text"
+                                        id="tag_name"
+                                        value={tag_name}
+                                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 mr-2"
+                                        placeholder="Type tag name"
+                                        onChange={(e) => setTagName(e.target.value)}
+                                        required
+                                    />
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 border border-gray-400 bg-blue-500 text-white rounded"
+                                        className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
                                     >
-                                        Submit
+                                        <svg
+                                            className="me-1 -ms-1 w-5 h-5"
+                                            fill="currentColor"
+                                            viewBox="0 0 20 20"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                        Add
                                     </button>
                                 </form>
+
+                                {/* Render the list of tags */}
+                                <div className="mb-4">
+                                    <h4 className="text-sm font-medium text-gray-900 mb-2">Existing Tags:</h4>
+                                    <ul>
+                                        {list_tags.map(tag => (
+                                            <li key={tag.id} className="text-gray-700">
+                                                {tag.tag_name}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
