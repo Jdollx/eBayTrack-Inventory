@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { getUniqueTagStyle } from './TagColors.js';
+import ListTags from './TagColors.js';
 
 const AddTags = () => {
     const [tag_name, setTagName] = useState('');
@@ -8,8 +10,10 @@ const AddTags = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        console.log("Submitting tag_name:", tag_name);
+        // call color tag
+        const tagStyle = getUniqueTagStyle();
 
+        // add color
         try {
             await fetch("http://localhost:3000/tags", {
                 method: "POST",
@@ -18,6 +22,9 @@ const AddTags = () => {
                 },
                 body: JSON.stringify({
                     tag_name: tag_name,
+                    bgColor: tagStyle.bgColor,
+                    textColor: tagStyle.textColor,
+                    borderColor: tagStyle.borderColor
                 }),
             });
             setTagName(''); // Clear the input field
@@ -79,7 +86,7 @@ const AddTags = () => {
                                     <button
                                         type="button"
                                         className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
-                                        onClick={handleSubmit}
+                                        onClick={closeModal}
                                     >
                                         <svg
                                             className="w-3 h-3"
@@ -134,13 +141,7 @@ const AddTags = () => {
                                 {/* Render the list of tags */}
                                 <div className="mb-4">
                                     <h4 className="text-sm font-medium text-gray-900 mb-2">Existing Tags:</h4>
-                                    <ul>
-                                        {list_tags.map(tag => (
-                                            <li key={tag.id} className="text-gray-700">
-                                                {tag.tag_name}
-                                            </li>
-                                        ))}
-                                    </ul>
+                                    <ListTags tags={list_tags} />
                                 </div>
                             </div>
                         </div>

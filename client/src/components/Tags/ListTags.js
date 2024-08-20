@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import './TagColors'
 
 const ListTags = () => {
     const[tags, setTags] = useState([]);
@@ -17,16 +18,17 @@ const ListTags = () => {
         getTags();
     }, []);
 
+
     return (
-        <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags List</h3>
-            <ul className="space-y-2">
-                {tags.map(tag => (
-                    <li key={tag.id} className="bg-gray-100 border border-gray-300 rounded-lg p-2">
-                        <span className={`text-${tag.color}-800 font-medium`}>{tag.tag_name}</span>
-                    </li>
-                ))}
-            </ul>
+        <div className="flex flex-wrap gap-2">
+            {tags.map(tag => (
+                <span
+                    key={tag.tag_id}
+                    className={`inline-flex items-center text-xs font-medium me-2 px-2.5 py-0.5 rounded ${tag.bgColor} ${tag.textColor} border ${tag.borderColor}`}
+                >
+                    {tag.tag_name}
+                </span>
+            ))}
         </div>
     );
 };

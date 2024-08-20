@@ -238,12 +238,12 @@ app.post("/transactions", async(req,res) => {
 // create tags (no model association)
 app.post("/tags", async (req, res) => {
     try {
-        const { tag_name } = req.body;
+        const { tag_name, bgColor, textColor, borderColor } = req.body;
         console.log("Received tag_name:", tag_name);
 
         const newTags = await pool.query(
-            "INSERT INTO tags (tag_name) VALUES ($1) RETURNING *",
-            [tag_name]
+            "INSERT INTO tags (tag_name, bgColor, textColor, borderColor) VALUES ($1, $2, $3, $4) RETURNING *",
+            [tag_name, bgColor, textColor, borderColor]
         );
 
         console.log("Inserted tag:", newTags.rows[0]);

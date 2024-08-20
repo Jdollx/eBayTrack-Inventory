@@ -45,7 +45,10 @@ CREATE TABLE transactions_logs (
 -- Table to store tags
 CREATE TABLE tags (
     tag_id SERIAL PRIMARY KEY,
-    tag_name VARCHAR(255) UNIQUE
+    tag_name VARCHAR(255) UNIQUE NOT NULL,
+    bgColor VARCHAR(20) NOT NULL,
+    textColor VARCHAR(20) NOT NULL,
+    borderColor VARCHAR(20) NOT NULL
 );
 
 -- Table to associate models with tags (many-to-many relationship)
