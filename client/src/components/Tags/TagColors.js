@@ -44,12 +44,26 @@ const ListTags = ({ tags }) => {
     return (
         <div className="flex flex-wrap gap-2">
             {tags.map(tag => (
-                <span
-                    key={tag.tag_id}
-                    className={`inline-flex items-center text-xs font-medium me-1 px-2 py-0.5 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
+                <div 
+                    key={tag.tag_id} 
+                    className={`relative inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
                 >
-                    {tag.tag_name}
-                </span>
+                    <span className="mr-4">{tag.tag_name}</span>
+                    <button 
+                        className="absolute top-1/2 right-1 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-800 border border-gray-300 rounded-full bg-gray-100 hover:bg-gray-200"
+                        aria-label="Remove tag"
+                    >
+                        <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             ))}
         </div>
     );
