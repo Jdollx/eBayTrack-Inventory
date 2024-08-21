@@ -76,7 +76,7 @@ const AddTags = () => {
                     aria-hidden="true"
                     className="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-x-hidden overflow-y-auto bg-gray-800 bg-opacity-50"
                 >
-                    <div className="relative w-full max-w-3xl p-6 max-h-screen">
+                    <div className="relative w-full max-w-md p-6 max-h-screen">
                         <div className="relative bg-white rounded-lg shadow-md flex h-full">
                             <div className="w-full p-4 flex flex-col justify-between">
                                 <div className="flex items-center justify-between mb-4">

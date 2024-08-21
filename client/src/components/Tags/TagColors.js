@@ -10,7 +10,6 @@ const tagStyles = [
     { bgColor: 'bg-indigo-100', textColor: 'text-indigo-800', borderColor: 'border-indigo-400' },
     { bgColor: 'bg-purple-100', textColor: 'text-purple-800', borderColor: 'border-purple-400' },
     { bgColor: 'bg-pink-100', textColor: 'text-pink-800', borderColor: 'border-pink-400' },
-    { bgColor: 'bg-black', textColor: 'text-white', borderColor: 'border-black' }, // Black style added
 ];
 
 let usedColors = new Set();
@@ -20,7 +19,7 @@ export const getUniqueTagStyle = (tag_name) => {
 
     // If the tag name contains 'lot', use the black style
     if (tag_name && tag_name.toLowerCase().includes('lot')) {
-        return tagStyles.find(style => style.bgColor === 'bg-black');
+        return { bgColor: 'bg-black', textColor: 'text-white', borderColor: 'border-gray-800' };
     }
 
     // Filter out styles that have already been used
