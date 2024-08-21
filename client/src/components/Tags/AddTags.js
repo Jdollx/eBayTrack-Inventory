@@ -11,7 +11,7 @@ const AddTags = () => {
         e.preventDefault();
 
         // call color tag
-        const tagStyle = getUniqueTagStyle();
+        const tagStyle = getUniqueTagStyle(tag_name);
 
         // add color
         try {

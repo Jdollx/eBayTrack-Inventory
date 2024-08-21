@@ -10,11 +10,19 @@ const tagStyles = [
     { bgColor: 'bg-indigo-100', textColor: 'text-indigo-800', borderColor: 'border-indigo-400' },
     { bgColor: 'bg-purple-100', textColor: 'text-purple-800', borderColor: 'border-purple-400' },
     { bgColor: 'bg-pink-100', textColor: 'text-pink-800', borderColor: 'border-pink-400' },
+    { bgColor: 'bg-black', textColor: 'text-white', borderColor: 'border-black' }, // Black style added
 ];
 
 let usedColors = new Set();
 
-export const getUniqueTagStyle = () => {
+export const getUniqueTagStyle = (tag_name) => {
+    console.log(`Checking tag: ${tag_name}`); // Debug log
+
+    // If the tag name contains 'lot', use the black style
+    if (tag_name && tag_name.toLowerCase().includes('lot')) {
+        return tagStyles.find(style => style.bgColor === 'bg-black');
+    }
+
     // Filter out styles that have already been used
     const availableStyles = tagStyles.filter(style => {
         return !Array.from(usedColors).some(
@@ -24,21 +32,26 @@ export const getUniqueTagStyle = () => {
         );
     });
 
+    console.log(`Available styles:`, availableStyles); // Debug log
+
     // If all styles are used, reset the usedColors and try again
     if (availableStyles.length === 0) {
         usedColors.clear();
-        return getUniqueTagStyle();
+        return getUniqueTagStyle(tag_name);
     }
 
     // Select a random style from available styles
     const randomIndex = Math.floor(Math.random() * availableStyles.length);
     const selectedStyle = availableStyles[randomIndex];
-    
+
     // Mark this style as used
     usedColors.add(selectedStyle);
 
+    console.log(`Selected style:`, selectedStyle); // Debug log
+
     return selectedStyle;
 };
+
 
 const ListTags = ({ tags, getTags }) => {
     const [modalContent, setModalContent] = useState(null);
