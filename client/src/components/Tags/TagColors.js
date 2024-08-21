@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 // Define tag styles with unique background, text, and border colors
 const tagStyles = [
@@ -41,6 +41,9 @@ export const getUniqueTagStyle = () => {
 };
 
 const ListTags = ({ tags, getTags }) => {
+    const [modalContent, setModalContent] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
     const deleteTag = async (id) => {
         try {
             await fetch(`http://localhost:3000/tags/${id}`, {
@@ -48,36 +51,61 @@ const ListTags = ({ tags, getTags }) => {
             });
             // refresh the tags on deletion
             await getTags();
+
         } catch (error) {
             console.error(error.message);
+            setModalContent("An error occurred while deleting the tag.");
+            setIsModalVisible(true);
         }
     };
 
+    const closeModal = () => {
+        setIsModalVisible(false);
+        setModalContent(null);
+    };
+
     return (
-        <div className="flex flex-wrap gap-2">
-            {tags.map(tag => (
-                <div 
-                    key={tag.tag_id} 
-                    className={`relative inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
-                >
-                    <span className="mr-4">{tag.tag_name}</span>
-                    <button 
-                        onClick={() => deleteTag(tag.tag_id)}
-                        className="absolute top-1/2 right-1 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-800 border border-gray-300 rounded-full bg-gray-100 hover:bg-gray-200"
-                        aria-label="Remove tag"
+        <div>
+            <div className="flex flex-wrap gap-2">
+                {tags.map(tag => (
+                    <div 
+                        key={tag.tag_id} 
+                        className={`relative inline-flex items-center text-xs font-medium px-2 py-0.5 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
                     >
-                        <svg
-                            className="w-3 h-3"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
+                        <span className="mr-4">{tag.tag_name}</span>
+                        <button 
+                            onClick={() => deleteTag(tag.tag_id)}
+                            className="absolute top-1/2 right-1 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-800 border border-gray-300 rounded-full bg-gray-100 hover:bg-gray-200"
+                            aria-label="Remove tag"
                         >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+                            <svg
+                                className="w-3 h-3"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                ))}
+            </div>
+
+            {/* Modal */}
+            {isModalVisible && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                    <div className="bg-white p-4 rounded shadow-lg">
+                        <p>{modalContent}</p>
+                        <button 
+                            onClick={closeModal}
+                            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
-            ))}
+            )}
         </div>
     );
 };

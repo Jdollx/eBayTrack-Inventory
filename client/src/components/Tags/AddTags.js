@@ -141,7 +141,7 @@ const AddTags = () => {
                                 {/* Render the list of tags */}
                                 <div className="mb-4">
                                     <h4 className="text-sm font-medium text-gray-900 mb-2">Existing Tags:</h4>
-                                    <ListTags tags={list_tags} />
+                                    <ListTags tags={list_tags} getTags={getTags} />
                                 </div>
                             </div>
                         </div>
