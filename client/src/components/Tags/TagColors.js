@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 
 // Define tag styles with unique background, text, and border colors
 const tagStyles = [
@@ -40,7 +40,19 @@ export const getUniqueTagStyle = () => {
     return selectedStyle;
 };
 
-const ListTags = ({ tags }) => {
+const ListTags = ({ tags, getTags }) => {
+    const deleteTag = async (id) => {
+        try {
+            await fetch(`http://localhost:3000/tags/${id}`, {
+                method: "DELETE",
+            });
+            // refresh the tags on deletion
+            await getTags();
+        } catch (error) {
+            console.error(error.message);
+        }
+    };
+
     return (
         <div className="flex flex-wrap gap-2">
             {tags.map(tag => (
@@ -50,6 +62,7 @@ const ListTags = ({ tags }) => {
                 >
                     <span className="mr-4">{tag.tag_name}</span>
                     <button 
+                        onClick={() => deleteTag(tag.tag_id)}
                         className="absolute top-1/2 right-1 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center text-gray-500 hover:text-gray-800 border border-gray-300 rounded-full bg-gray-100 hover:bg-gray-200"
                         aria-label="Remove tag"
                     >

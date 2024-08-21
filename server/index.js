@@ -264,6 +264,18 @@ app.get("/tags", async(req,res) => {
     }
 });
 
+app.delete("/tags/:id", async(req,res) => {
+    try {
+        const {id} = req.params;
+        const deleteTags = await pool.query("DELETE FROM tags WHERE tag_id = $1 RETURNING *",
+        [id]); 
+        res.json(deleteTags.rows);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 // create association between tags and models via ids
 app.post("/models/:id/tags", async (req, res) => {
     try {
