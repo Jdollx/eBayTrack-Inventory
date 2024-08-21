@@ -22,15 +22,15 @@ const TagDropdown = ({ selectedTags, setSelectedTags }) => {
   }, []);
 
   const handleTagSelection = (e) => {
-    const selectedTag = e.target.value;
-    if (!selectedTags.includes(selectedTag) && selectedTag) {
-      setSelectedTags([...selectedTags, selectedTag]);
+    const selectedTagId = e.target.value;
+    if (selectedTagId && !selectedTags.includes(selectedTagId)) {
+      setSelectedTags([...selectedTags, selectedTagId]);
     }
   };
 
   return (
     <div>
-      <select onChange={handleTagSelection}>
+      <select onChange={handleTagSelection} defaultValue="">
         <option value="">Select a tag</option>
         {tags.length > 0 ? (
           tags.map(tag => (
@@ -43,9 +43,24 @@ const TagDropdown = ({ selectedTags, setSelectedTags }) => {
         )}
       </select>
       <div>
-        {selectedTags.map(tagId => (
-          <span key={tagId}>{tags.find(tag => tag.tag_id === tagId)?.tag_name || 'Unknown tag'}</span>
-        ))}
+        {selectedTags.map(tagId => {
+          const tag = tags.find(tag => tag.tag_id === parseInt(tagId, 10)); // Convert tagId to number for comparison
+          return tag ? (
+            <span
+              key={tagId}
+              className={`inline-flex items-center text-xs font-medium me-2 px-2.5 py-0.5 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
+            >
+              {tag.tag_name}
+            </span>
+          ) : (
+            <span
+              key={tagId}
+              className="inline-flex items-center text-xs font-medium me-2 px-2.5 py-0.5 rounded bg-gray-200 text-gray-800 border border-gray-400"
+            >
+              Unknown tag
+            </span>
+          );
+        })}
       </div>
     </div>
   );
