@@ -9,11 +9,13 @@ import FilterBar from './components/FilterBar';
 import SearchBar from './components/SearchBar';
 import AddTags from './components/Tags/AddTags';
 import ListTags from './components/Tags/ListTags';
+import Banner from './components/Banner';
 
 
 function App() {
   return (
     <>
+    <Banner/>
       <div className="container mx-auto px-4">
         <AddModels />
         <AddTags />
