@@ -8,7 +8,6 @@ import ListModels from './components/ListModels';
 import FilterBar from './components/FilterBar';
 import SearchBar from './components/SearchBar';
 import AddTags from './components/Tags/AddTags';
-import ListTags from './components/Tags/ListTags';
 import Banner from './components/Banner';
 
 
@@ -25,7 +24,6 @@ function App() {
         <SearchBar />
         <FilterBar />
         <ListModels />
-        <ListTags />
       </div>
     </>
   );

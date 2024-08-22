@@ -41,12 +41,20 @@ app.use(express.json());
 
 app.post("/models", upload.single('model_image'), async (req, res) => {
     try {
-        // Get model data from client side
-        const { model_name, model_color, model_quantity, purchase_date, purchase_price, sale_date, sale_price, tag_name } = req.body;
+        const { model_name, model_color, model_quantity, purchase_date, purchase_price, sale_date, sale_price, tags } = req.body;
         const model_image = req.file ? `/images/${req.file.filename}` : null;
-        console.log('Model Image:', model_image);
 
-        // Insert new model into the database
+        // Check if model already exists
+        const existingModel = await pool.query(
+            "SELECT * FROM model_inventory WHERE model_name = $1",
+            [model_name]
+        );
+
+        if (existingModel.rows.length > 0) {
+            return res.status(409).json({ error: "Model with this name already exists" });
+        }
+
+        // Insert new model
         const newModel = await pool.query(
             "INSERT INTO model_inventory (model_name, model_image, model_color, model_quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
             [model_name, model_image, model_color, model_quantity]
@@ -54,7 +62,7 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
 
         const modelId = newModel.rows[0].model_id;
 
-        // Insert purchase data into the purchase_data table
+        // Insert purchase data if provided
         if (purchase_date) {
             await pool.query(
                 "INSERT INTO purchase_data (model_id, purchase_date, purchase_price) VALUES ($1, $2, $3)", 
@@ -62,29 +70,56 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
             );
         }
 
-        // insert sale data into sale_data
+        // Insert sale data if provided
         if (sale_date) {
             await pool.query(
                 "INSERT INTO sale_data (model_id, sale_date, sale_price) VALUES ($1, $2, $3)", 
                 [modelId, sale_date, sale_price]
             );
         }
-        // insert into tags
+
+        // Insert tags if provided
+// Insert tags if provided
         if (tags) {
-            await pool.query(
-                "INSERT INTO tags (tag_name) VALUES ($1)", 
-                [tag_name]
-            );
+            const tagArray = JSON.parse(tags);
+
+            // Collect tag associations to insert
+            const tagAssociations = tagArray.map(async (tag_id) => {
+                try {
+                    // Check if the tag is already associated with the model
+                    const existingAssociation = await pool.query(
+                        "SELECT * FROM model_tags WHERE model_id = $1 AND tag_id = $2",
+                        [modelId, tag_id]
+                    );
+
+                    if (existingAssociation.rows.length === 0) {
+                        // Insert new association if it doesn't exist
+                        await pool.query(
+                            "INSERT INTO model_tags (model_id, tag_id) VALUES ($1, $2) RETURNING *",
+                            [modelId, tag_id]
+                        );
+                        console.log('Tag associated:', tag_id);
+                    } else {
+                        console.log(`Tag ${tag_id} already associated with model ${modelId}`);
+                    }
+                } catch (error) {
+                    console.error('Error associating tag:', error.message);
+                    throw error; // Re-throw to ensure Promise.all rejects
+                }
+            });
+
+            await Promise.all(tagAssociations);
         }
 
-        // Return the newly inserted model
-        res.json(newModel.rows[0]);
 
+        res.status(201).json(newModel.rows[0]);
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send("Server error");
+        console.error('Error inserting model:', error.message);
+        res.status(500).json({ error: 'Server Error', details: error.message });
     }
 });
+
+
 
 
 // get all model inventories
@@ -276,19 +311,54 @@ app.delete("/tags/:id", async(req,res) => {
     }
 });
 
-// create association between tags and models via ids
-app.post("/models/:id/tags", async (req, res) => {
+// app.post("/models/:id/tags", async (req, res) => {
+//     try {
+//         const { id } = req.params; // model_id
+//         const { tag_id } = req.body;
+
+//         // Check if the association already exists
+//         const existingAssociation = await pool.query(
+//             "SELECT * FROM model_tags WHERE model_id = $1 AND tag_id = $2",
+//             [id, tag_id]
+//         );
+
+//         if (existingAssociation.rows.length > 0) {
+//             return res.status(409).json({ error: "Tag is already associated with this model" });
+//         }
+
+//         // Insert new association
+//         const newAssociation = await pool.query(
+//             "INSERT INTO model_tags (model_id, tag_id) VALUES ($1, $2) RETURNING *",
+//             [id, tag_id]
+//         );
+
+//         res.status(201).json(newAssociation.rows[0]);
+//     } catch (error) {
+//         console.error(error.message);
+//         res.status(500).json({ error: "Server Error" });
+//     }
+// });
+
+// Get tags associated with a specific model
+app.get("/models/:id/tags", async (req, res) => {
     try {
         const { id } = req.params; // model_id
-        const { tag_id} = req.body;
-        const newAssociation = await pool.query(
-            "INSERT INTO model_tags (model_id, tag_id) VALUES ($1, $2) RETURNING *",
-            [id, tag_id]
-        );
-        res.json(newAssociation.rows[0]);
-    } catch (error) {
-        console.error(error.message);
         
+        // Query to get tags associated with the model
+        const result = await pool.query(
+            `SELECT t.tag_id, t.tag_name
+             FROM model_tags mt
+             JOIN tags t ON mt.tag_id = t.tag_id
+             WHERE mt.model_id = $1`,
+            [id]
+        );
+        
+        // Return the tags associated with the model
+        res.status(200).json(result.rows);
+    } catch (error) {
+        // Log and respond with error message
+        console.error('Error retrieving tags for model:', error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 

@@ -11,10 +11,14 @@ const AddModels = () => {
   const [salePrice, setSalePrice] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Remove duplicates from selectedTags
+    const uniqueTags = Array.from(new Set(selectedTags));
+  
     try {
       const formData = new FormData();
       formData.append('model_name', modelName);
@@ -24,36 +28,63 @@ const AddModels = () => {
       formData.append('purchase_price', purchasePrice);
       formData.append('sale_date', saleDate);
       formData.append('sale_price', salePrice);
-      formData.append('tags', JSON.stringify(selectedTags)); // Convert selectedTags to JSON string
-
+      formData.append('tags', JSON.stringify(uniqueTags));
+  
+      // Submit the model data
       const modelResponse = await fetch('http://localhost:3000/models', {
         method: 'POST',
         body: formData,
       });
-
+  
+      if (!modelResponse.ok) {
+        throw new Error(`HTTP error! Status: ${modelResponse.status}`);
+      }
+  
       const newModel = await modelResponse.json();
-
+  
       if (newModel.model_id) {
-        const tagAssociations = selectedTags.map(async (tag_id) => {
-          await fetch(`http://localhost:3000/models/${newModel.model_id}/tags`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ tag_id }),
-          });
-        });
-        await Promise.all(tagAssociations);
-        closeModal();
-        window.location = '/';
+        // Associate tags with the new model
+        await Promise.all(uniqueTags.map(async (tag_id) => {
+          try {
+            const response = await fetch(`http://localhost:3000/models/${newModel.model_id}/tags`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ tag_id }),
+            });
+  
+            if (!response.ok) {
+              const errorDetails = await response.text(); // Read the response body
+              if (response.status === 409 && errorDetails.includes('Conflict')) {
+                console.warn(`Tag ${tag_id} is already associated with this model. Ignoring.`);
+                return; // Ignore conflict error and continue with other tags
+              }
+              throw new Error(`Failed to associate tag ${tag_id}: ${response.statusText} - ${errorDetails}`);
+            }
+          } catch (error) {
+            console.error('Error associating tag:', error.message);
+            // Optionally, handle specific errors or log them
+          }
+        }));
+  
+        console.log('Model and tags saved successfully!');
+        closeModal();  // Close the modal
+        window.location.reload(); // Reload the page to reflect the changes
       } else {
-        throw new Error('Failed to create model');
+        console.error('Model ID not returned');
+        setError('Failed to retrieve model ID.');
       }
     } catch (error) {
       console.error('Error saving model:', error.message);
+      setError('An error occurred while saving the model.');
     }
   };
+  
 
   const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
+  const closeModal = () => {
+    console.log('Modal is closing');
+    setIsModalOpen(false);
+  };
 
   return (
     <>
@@ -206,17 +237,39 @@ const AddModels = () => {
                       />
                     </div>
 
-                    <TagDropdown selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
+                    <div className="mb-4">
+                      <label htmlFor="tags" className="block mb-2 text-sm font-medium text-gray-900">
+                        Tags:
+                      </label>
+                      <TagDropdown
+                        selectedTags={selectedTags}
+                        setSelectedTags={setSelectedTags}
+                      />
+                    </div>
 
+                    <div className="flex gap-4 mt-6">
+                      <button
+                        type="submit"
+                        className="w-full text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                      >
+                        Save Model
+                      </button>
+                      <button
+                        type="button"
+                        className="w-full text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                        onClick={closeModal}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+
+                    {error && (
+                      <div className="mt-4 text-red-500 text-sm">
+                        {error}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                <button
-                  type="submit"
-                  className="w-full text-white bg-primary-600 hover:bg-primary-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                >
-                  Add New Model
-                </button>
               </form>
             </div>
           </div>
