@@ -352,6 +352,24 @@ app.post('/model_tags', (req, res) => {
     });
 });
 
+// Fetch model-tag associations
+app.get('/model_tags', (req, res) => {
+    const query = `
+        SELECT model_id, tag_id
+        FROM model_tags
+    `;
+
+    pool.query(query, (error, results) => {
+        if (error) {
+            res.status(400).send(error.message);
+        } else {
+            res.json(results.rows);
+        }
+    });
+});
+
+
+
 
 
 
