@@ -9,6 +9,7 @@ const ListModels = () => {
 
   // Function to format date as mm/dd/yyyy
   const formatDate = (dateString) => {
+    if (!dateString) return "N/A"; // Handle missing date
     const date = new Date(dateString);
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
     const day = String(date.getDate()).padStart(2, '0');
@@ -16,25 +17,29 @@ const ListModels = () => {
     return `${month}/${day}/${year}`;
   };
 
+  // Function to delete a model
   const deleteModel = async (id) => {
     try {
       await fetch(`http://localhost:3000/models/${id}`, {
         method: "DELETE",
       });
-      setModels(models.filter((model) => model.model_id !== id));
+      setModels((prevModels) => prevModels.filter((model) => model.model_id !== id));
     } catch (error) {
-      console.error(error.message);
+      console.error("Error deleting model:", error.message);
     }
   };
 
-  // fetches models
+  // Function to fetch models
   const getModels = async () => {
     try {
       const response = await fetch("http://localhost:3000/models");
+      if (!response.ok) throw new Error("Network response was not ok.");
       const jsonData = await response.json();
-      setModels(jsonData);
+      // Ensure no duplicates
+      const uniqueModels = Array.from(new Map(jsonData.map(model => [model.model_id, model])).values());
+      setModels(uniqueModels);
     } catch (error) {
-      console.error(error.message);
+      console.error("Error fetching models:", error.message);
     }
   };
 
@@ -42,8 +47,7 @@ const ListModels = () => {
     getModels();
   }, []);
 
-
-  // opens and closes edit modal
+  // Functions to handle modal open/close
   const openModal = (model) => {
     setSelectedModel(model);
     setIsModalOpen(true);
@@ -54,6 +58,7 @@ const ListModels = () => {
     setSelectedModel(null);
   };
 
+  // Function to handle saving updates
   const handleSave = async (updatedModel) => {
     try {
       await fetch(`http://localhost:3000/models/${updatedModel.model_id}`, {
@@ -63,11 +68,14 @@ const ListModels = () => {
         },
         body: JSON.stringify(updatedModel),
       });
-      setModels(models.map((model) =>
-        model.model_id === updatedModel.model_id ? updatedModel : model
-      ));
+      setModels((prevModels) =>
+        prevModels.map((model) =>
+          model.model_id === updatedModel.model_id ? updatedModel : model
+        )
+      );
+      closeModal(); // Close the modal after saving
     } catch (error) {
-      console.error(error.message);
+      console.error("Error updating model:", error.message);
     }
   };
 
@@ -88,13 +96,8 @@ const ListModels = () => {
                 <span className="text-gray-500">No Image Available</span>
               </div>
             )}
-            
 
-
-
-
-
-            {/* card text with info */}
+            {/* Card text with info */}
             <h3 className="text-left text-lg font-semibold mb-2">{model.model_name}</h3>
             <p className="text-left">Quantity: {model.model_quantity}</p>
             <p className="text-left">Purchase Date: {formatDate(model.purchase_date)}</p>

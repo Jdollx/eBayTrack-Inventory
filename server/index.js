@@ -289,6 +289,7 @@ app.post("/tags", async (req, res) => {
     }
 });
 
+// list the tags
 app.get("/tags", async(req,res) => {
     try {
         const allTags = await pool.query("SELECT * FROM tags"); 
@@ -299,6 +300,8 @@ app.get("/tags", async(req,res) => {
     }
 });
 
+
+// used to delete tag in modal
 app.delete("/tags/:id", async(req,res) => {
     try {
         const {id} = req.params;
@@ -311,35 +314,7 @@ app.delete("/tags/:id", async(req,res) => {
     }
 });
 
-// app.post("/models/:id/tags", async (req, res) => {
-//     try {
-//         const { id } = req.params; // model_id
-//         const { tag_id } = req.body;
-
-//         // Check if the association already exists
-//         const existingAssociation = await pool.query(
-//             "SELECT * FROM model_tags WHERE model_id = $1 AND tag_id = $2",
-//             [id, tag_id]
-//         );
-
-//         if (existingAssociation.rows.length > 0) {
-//             return res.status(409).json({ error: "Tag is already associated with this model" });
-//         }
-
-//         // Insert new association
-//         const newAssociation = await pool.query(
-//             "INSERT INTO model_tags (model_id, tag_id) VALUES ($1, $2) RETURNING *",
-//             [id, tag_id]
-//         );
-
-//         res.status(201).json(newAssociation.rows[0]);
-//     } catch (error) {
-//         console.error(error.message);
-//         res.status(500).json({ error: "Server Error" });
-//     }
-// });
-
-// Get tags associated with a specific model
+// display tags associated with a specific model
 app.get("/models/:id/tags", async (req, res) => {
     try {
         const { id } = req.params; // model_id
@@ -361,6 +336,22 @@ app.get("/models/:id/tags", async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// associate tags with models
+app.post('/model_tags', (req, res) => {
+    const { model_id, tag_id } = req.body;
+
+    const query = `INSERT INTO model_tags (model_id, tag_id) VALUES ($1, $2)`;
+
+    pool.query(query, [model_id, tag_id], (error, results) => {
+        if (error) {
+            res.status(400).send(error.message);
+        } else {
+            res.status(201).send('Tag associated with model successfully');
+        }
+    });
+});
+
 
 
 

@@ -15,10 +15,10 @@ const AddModels = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     // Remove duplicates from selectedTags
     const uniqueTags = Array.from(new Set(selectedTags));
-  
+
     try {
       const formData = new FormData();
       formData.append('model_name', modelName);
@@ -29,43 +29,43 @@ const AddModels = () => {
       formData.append('sale_date', saleDate);
       formData.append('sale_price', salePrice);
       formData.append('tags', JSON.stringify(uniqueTags));
-  
+
       // Submit the model data
       const modelResponse = await fetch('http://localhost:3000/models', {
         method: 'POST',
         body: formData,
       });
-  
+
       if (!modelResponse.ok) {
         throw new Error(`HTTP error! Status: ${modelResponse.status}`);
       }
-  
+
       const newModel = await modelResponse.json();
-  
+
       if (newModel.model_id) {
-        // Associate tags with the new model
-        await Promise.all(uniqueTags.map(async (tag_id) => {
-          try {
-            const response = await fetch(`http://localhost:3000/models/${newModel.model_id}/tags`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ tag_id }),
-            });
-  
-            if (!response.ok) {
-              const errorDetails = await response.text(); // Read the response body
-              if (response.status === 409 && errorDetails.includes('Conflict')) {
-                console.warn(`Tag ${tag_id} is already associated with this model. Ignoring.`);
-                return; // Ignore conflict error and continue with other tags
-              }
-              throw new Error(`Failed to associate tag ${tag_id}: ${response.statusText} - ${errorDetails}`);
+        try {
+          const response = await fetch('http://localhost:3000/model_tags', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model_id: newModel.model_id,
+              tag_ids: uniqueTags,
+            }),
+          });
+
+          if (!response.ok) {
+            const errorDetails = await response.text(); // Read the response body
+            if (response.status === 409 && errorDetails.includes('Conflict')) {
+              console.warn('One or more tags are already associated with this model. Ignoring.');
+              return; // Ignore conflict error and continue
             }
-          } catch (error) {
-            console.error('Error associating tag:', error.message);
-            // Optionally, handle specific errors or log them
+            throw new Error(`Failed to associate tags: ${response.statusText} - ${errorDetails}`);
           }
-        }));
-  
+        } catch (error) {
+          console.error('Error associating tags:', error.message);
+          // Optionally, handle specific errors or log them
+        }
+
         console.log('Model and tags saved successfully!');
         closeModal();  // Close the modal
         window.location.reload(); // Reload the page to reflect the changes
@@ -78,7 +78,6 @@ const AddModels = () => {
       setError('An error occurred while saving the model.');
     }
   };
-  
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
