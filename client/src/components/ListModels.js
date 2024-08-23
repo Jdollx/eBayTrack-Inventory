@@ -145,14 +145,16 @@ const ListModels = () => {
             <p className="text-left">Purchase Price: ${model.purchase_price}</p>
             <p className="text-left">Sale Date: {formatDate(model.sale_date)}</p>
             <p className="text-left">Sale Price: ${model.sale_price}</p>
+
+            {/* tag call and formatting */}
             <p>Tags:</p>
-            <div className="tags">
+            <div className="tags flex flex-wrap gap-2 rounded">
               {modelTags[model.model_id] && modelTags[model.model_id].length > 0 ? (
                 modelTags[model.model_id].map(tag => (
                   <span
                     key={tag.tag_id}
-                    className={`tag ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
-                  >
+                    className={`relative inline-flex items-center text-xs font-medium px-3 py-1 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
+                    >
                     {tag.tag_name}
                   </span>
                 ))
@@ -160,6 +162,8 @@ const ListModels = () => {
                 <div>No tags available</div>
               )}
             </div>
+
+
 
             <div className="flex gap-2 mt-4">
               <button className="bg-green-500 text-white px-4 py-2 rounded">Logs</button>
