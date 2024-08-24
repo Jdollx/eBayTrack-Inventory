@@ -43,7 +43,7 @@ const SearchBar = () => {
                         onChange={e => setModel_Name(e.target.value)}
                         id="default-search" 
                         className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500" 
-                        placeholder="Add a model..." 
+                        placeholder="Search inventory..." 
                         required 
                     />
                     <button 

@@ -4,6 +4,7 @@ import TagDropdown from './Tags/TagDropdown';
 const AddModels = () => {
   const [modelName, setModelName] = useState('');
   const [modelImage, setModelImage] = useState(null);
+  const [modelColor, setModelColor] = useState('');
   const [modelQuantity, setModelQuantity] = useState('');
   const [purchaseDate, setPurchaseDate] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
@@ -23,6 +24,7 @@ const AddModels = () => {
       const formData = new FormData();
       formData.append('model_name', modelName);
       formData.append('model_image', modelImage);
+      formData.append('model_color', modelColor);
       formData.append('model_quantity', modelQuantity);
       formData.append('purchase_date', purchaseDate);
       formData.append('purchase_price', purchasePrice);
@@ -163,6 +165,21 @@ const AddModels = () => {
                         placeholder="Type model name"
                         value={modelName}
                         onChange={(e) => setModelName(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="model_color" className="block mb-2 text-sm font-medium text-gray-900">
+                        Model Color:
+                      </label>
+                      <input
+                        type="text"
+                        id="model_color"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type model name"
+                        value={modelColor}
+                        onChange={(e) => setModelColor(e.target.value)}
                         required
                       />
                     </div>

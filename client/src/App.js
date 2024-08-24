@@ -6,7 +6,7 @@ import React from 'react';
 import AddModels from './components/AddModels';
 import ListModels from './components/ListModels';
 import FilterBar from './components/FilterBar';
-import SearchBar from './components/SearchBar';
+import SearchBar from './components/SearchBar/SearchBar';
 import AddTags from './components/Tags/AddTags';
 import Banner from './components/Banner';
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import EditModels from "./EditModels";
 import AddModels from "./AddModels";
+import LogsTable from "./Logs/LogsTable";
 
 const ListModels = () => {
   const [models, setModels] = useState([]);
@@ -8,6 +9,7 @@ const ListModels = () => {
   const [selectedModel, setSelectedModel] = useState(null);
   const [tags, setTags] = useState({});
   const [modelTags, setModelTags] = useState({});
+  const [isLogsTableOpen, setIsLogsTableOpen] = useState(false);
 
   // Function to format date as mm/dd/yyyy
   const formatDate = (dateString) => {
@@ -89,7 +91,7 @@ const ListModels = () => {
   }, []);
 
   // Functions to handle modal open/close
-  const openModal = (model) => {
+  const openEditModal = (model) => {
     setSelectedModel(model);
     setIsModalOpen(true);
   };
@@ -125,62 +127,68 @@ const ListModels = () => {
       <ul id="model-list" className="flex flex-wrap justify-center gap-10 w-full">
         {models.map((model) => (
           <li key={model.model_id} className="flex flex-col p-4 border rounded shadow-md w-64">
-            {/* Conditionally render the image or a placeholder */}
-            {model.model_image ? (
-              <img
-                src={`http://localhost:3000${model.model_image}`}
-                alt={model.model_name}
-                className="w-full h-52 object-cover mb-4 rounded-lg"
-              />
-            ) : (
-              <div className="w-full h-52 bg-gray-200 flex items-center justify-center mb-4 rounded-lg">
-                <span className="text-gray-500">No Image Available</span>
-              </div>
-            )}
+  {/* Conditionally render the image or a placeholder */}
+  {model.model_image ? (
+    <img
+      src={`http://localhost:3000${model.model_image}`}
+      alt={model.model_name}
+      className="w-full h-52 object-cover mb-4 rounded-lg"
+    />
+  ) : (
+    <div className="w-full h-52 bg-gray-200 flex items-center justify-center mb-4 rounded-lg">
+      <span className="text-gray-500">No Image Available</span>
+    </div>
+  )}
 
-            {/* Card text with info */}
-            <h3 className="text-left text-xl font-semibold mb-2">{model.model_name}</h3>
-            <p className="text-left">Quantity: {model.model_quantity}</p>
-            <p className="text-left">Purchase Date: {formatDate(model.purchase_date)}</p>
-            <p className="text-left">Purchase Price: ${model.purchase_price}</p>
-            <p className="text-left">Sale Date: {formatDate(model.sale_date)}</p>
-            <p className="text-left">Sale Price: ${model.sale_price}</p>
+  {/* Card text with info */}
+  <h3 className="text-left text-2xl font-semibold">{model.model_name}</h3>
+  <h4 className="text-left text-xl font-semibold mb-2 text-gray-400">{model.model_color}</h4>
+  <p className="text-left">Quantity: {model.model_quantity}</p>
+  <p className="text-left">Purchase Date: {formatDate(model.purchase_date)}</p>
+  <p className="text-left">Purchase Price: ${model.purchase_price}</p>
+  <p className="text-left">Sale Date: {formatDate(model.sale_date)}</p>
+  <p className="text-left">Sale Price: ${model.sale_price}</p>
 
-            {/* tag call and formatting */}
-            <p>Tags:</p>
-            <div className="tags flex flex-wrap gap-2 rounded">
-              {modelTags[model.model_id] && modelTags[model.model_id].length > 0 ? (
-                modelTags[model.model_id].map(tag => (
-                  <span
-                    key={tag.tag_id}
-                    className={`relative inline-flex items-center text-xs font-medium px-3 py-1 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
-                    >
-                    {tag.tag_name}
-                  </span>
-                ))
-              ) : (
-                <div>No tags available</div>
-              )}
-            </div>
+  {/* Tags */}
+  <p>Tags:</p>
+  <div className="tags flex flex-wrap gap-2 rounded mb-4">
+    {modelTags[model.model_id] && modelTags[model.model_id].length > 0 ? (
+      modelTags[model.model_id].map(tag => (
+        <span
+          key={tag.tag_id}
+          className={`relative inline-flex items-center text-xs font-medium px-3 py-1 rounded ${tag.bgcolor} ${tag.textcolor} border ${tag.bordercolor}`}
+        >
+          {tag.tag_name}
+        </span>
+      ))
+    ) : (
+      <div>No tags available</div>
+    )}
+  </div>
 
+  {/* Button container */}
+  <div className="flex gap-2 mt-auto">
+    <button
+      className="bg-green-500 text-white px-4 py-2 rounded"
+      onClick={() => setIsLogsTableOpen(true)} // Open LogsTable
+    >
+      Logs
+    </button>
+    <button
+      className="bg-blue-500 text-white px-4 py-2 rounded"
+      onClick={() => openEditModal(model)}
+    >
+      Edit
+    </button>
+    <button
+      className="bg-red-500 text-white px-4 py-2 rounded"
+      onClick={() => deleteModel(model.model_id)}
+    >
+      Delete
+    </button>
+  </div>
+</li>
 
-
-            <div className="flex gap-2 mt-4">
-              <button className="bg-green-500 text-white px-4 py-2 rounded">Logs</button>
-              <button
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-                onClick={() => openModal(model)}
-              >
-                Edit
-              </button>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded"
-                onClick={() => deleteModel(model.model_id)}
-              >
-                Delete
-              </button>
-            </div>
-          </li>
         ))}
       </ul>
 
@@ -189,6 +197,12 @@ const ListModels = () => {
           model={selectedModel}
           closeModal={closeModal}
           onSave={handleSave}
+        />
+      )}
+      {isLogsTableOpen && (
+      <LogsTable
+          isOpen={isLogsTableOpen}
+          onClose={() => setIsLogsTableOpen(false)}
         />
       )}
     </div>
