@@ -369,7 +369,26 @@ app.get('/model_tags', (req, res) => {
 });
 
 
+// autocomplete search
+    // ilike makes case insensitive
+    // 10 limits number of rows
+    // query will take the search input and wildcard through the database
+app.get('/api/search', async (req, res) => {
+  const query = req.query.query;
 
+  try {
+    const result = await pool.query(
+      `SELECT model_id, model_name, model_color, model_image 
+       FROM model_inventory 
+       WHERE model_name ILIKE $1 LIMIT 10`, 
+      [`%${query}%`]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching models:', error);
+    res.status(500).send('Server error');
+  }
+});
 
 
 
