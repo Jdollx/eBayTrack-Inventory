@@ -36,11 +36,33 @@ const SearchBarLogic = ({ model_name, setModel_Name }) => {
   const getSuggestionValue = suggestion => suggestion.model_name;
 
   // Render each suggestion
-  const renderSuggestion = suggestion => (
-    <div>
-      {suggestion.model_name}
-    </div>
-  );
+  const renderSuggestion = suggestion => {
+    // Construct the image URL only if model_image is present and starts with 'http'
+    const imageUrl = suggestion.model_image
+      ? (suggestion.model_image.startsWith('http')
+          ? suggestion.model_image
+          : `http://localhost:3000${suggestion.model_image}`)
+      : null;
+
+    return (
+      <div className="flex items-start mb-4 border-b border-gray-300 pb-4">
+        {/* Image */}
+        <div className="flex-shrink-0 mr-4">
+          <img
+            src={imageUrl}
+            alt={suggestion.model_name}
+            className="w-16 h-16 object-cover rounded-lg"
+          />
+        </div>
+        
+        {/* Text content */}
+        <div className="flex-1">
+          <div className="text-black text-lg font-semibold">{suggestion.model_name}</div>
+          <div className="text-gray-500 text-sm">{suggestion.model_color}</div>
+        </div>
+      </div>
+    );
+  };
 
   // Define input props for Autosuggest
   const inputProps = {
