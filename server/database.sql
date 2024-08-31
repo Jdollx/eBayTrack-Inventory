@@ -61,7 +61,8 @@ CREATE TABLE model_tags (
 -- Table for scraped data
 CREATE TABLE scraped_idyb (
     scraped_idyb_id SERIAL PRIMARY KEY,  
-    model_id INT REFERENCES model_inventory(model_id),
-    scraped_idyb_name VARCHAR(255) NOT NULL, 
+    scraped_idyb_name VARCHAR(255) NOT NULL,
+    scraped_idyb_color VARCHAR(255),
     scraped_idyb_image VARCHAR(255)
 );
+
