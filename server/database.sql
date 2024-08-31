@@ -66,3 +66,4 @@ CREATE TABLE scraped_idyb (
     scraped_idyb_color VARCHAR(255),
     scraped_idyb_image VARCHAR(255)
 );
+
