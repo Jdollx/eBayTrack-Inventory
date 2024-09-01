@@ -118,9 +118,6 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
 });
 
 
-
-
-
 // get all model inventories
 app.get("/models", async (req, res) => {
     try {
