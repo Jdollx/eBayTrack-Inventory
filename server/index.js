@@ -41,7 +41,7 @@ app.use(express.json());
 
 app.post("/models", upload.single('model_image'), async (req, res) => {
     try {
-        const { model_name, model_color, model_quantity, purchase_date, purchase_price, sale_date, sale_price, tags } = req.body;
+        const { model_mold, model_name, model_color, model_quantity, purchase_date, purchase_quantity, purchase_price, purchase_shipping, purchase_fees, sale_date, sale_quantity, sale_price, sale_shipping, sale_fees, tags } = req.body;
         const model_image = req.file ? `/images/${req.file.filename}` : null;
 
         // Check if model already exists
@@ -56,8 +56,8 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
 
         // Insert new model
         const newModel = await pool.query(
-            "INSERT INTO model_inventory (model_name, model_image, model_color, model_quantity) VALUES ($1, $2, $3, $4) RETURNING *", 
-            [model_name, model_image, model_color, model_quantity]
+            "INSERT INTO model_inventory (model_mold, model_name, model_image, model_color, model_quantity) VALUES ($1, $2, $3, $4, $5) RETURNING *", 
+            [model_mold, model_name, model_image, model_color, model_quantity]
         );
 
         const modelId = newModel.rows[0].model_id;
@@ -65,21 +65,20 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
         // Insert purchase data if provided
         if (purchase_date) {
             await pool.query(
-                "INSERT INTO purchase_data (model_id, purchase_date, purchase_price) VALUES ($1, $2, $3)", 
-                [modelId, purchase_date, purchase_price]
+                "INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees) VALUES ($1, $2, $3, $4, $5, $6)", 
+                [modelId, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees]
             );
         }
 
         // Insert sale data if provided
         if (sale_date) {
             await pool.query(
-                "INSERT INTO sale_data (model_id, sale_date, sale_price) VALUES ($1, $2, $3)", 
-                [modelId, sale_date, sale_price]
+                "INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees) VALUES ($1, $2, $3, $4, $5, $6)", 
+                [modelId, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees]
             );
         }
 
         // Insert tags if provided
-// Insert tags if provided
         if (tags) {
             const tagArray = JSON.parse(tags);
 
@@ -111,13 +110,13 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
             await Promise.all(tagAssociations);
         }
 
-
         res.status(201).json(newModel.rows[0]);
     } catch (error) {
         console.error('Error inserting model:', error.message);
         res.status(500).json({ error: 'Server Error', details: error.message });
     }
 });
+
 
 
 

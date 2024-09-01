@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import TagDropdown from './Tags/TagDropdown';
 
 const AddModels = () => {
+  const [modelMold, setModelMold] = useState('');
   const [modelName, setModelName] = useState('');
   const [modelImage, setModelImage] = useState(null);
   const [modelColor, setModelColor] = useState('');
   const [modelQuantity, setModelQuantity] = useState('');
   const [purchaseDate, setPurchaseDate] = useState('');
   const [purchasePrice, setPurchasePrice] = useState('');
+  const [purchaseShipping, setPurchaseShipping] = useState('');
+  const [purchaseFees, setPurchaseFees] = useState('');
   const [saleDate, setSaleDate] = useState('');
   const [salePrice, setSalePrice] = useState('');
+  const [saleShipping, setSaleShipping] = useState('');
+  const [saleFees, setSaleFees] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [error, setError] = useState('');
@@ -22,14 +27,19 @@ const AddModels = () => {
 
     try {
       const formData = new FormData();
+      formData.append('model_mold', modelMold);
       formData.append('model_name', modelName);
       formData.append('model_image', modelImage);
       formData.append('model_color', modelColor);
       formData.append('model_quantity', modelQuantity);
       formData.append('purchase_date', purchaseDate);
       formData.append('purchase_price', purchasePrice);
+      formData.append('purchase_shipping', purchaseShipping);
+      formData.append('purchase_fees', purchaseFees);
       formData.append('sale_date', saleDate);
       formData.append('sale_price', salePrice);
+      formData.append('sale_shipping', saleShipping);
+      formData.append('sale_fees', saleFees);
       formData.append('tags', JSON.stringify(uniqueTags));
 
       // Submit the model data
@@ -65,7 +75,6 @@ const AddModels = () => {
           }
         } catch (error) {
           console.error('Error associating tags:', error.message);
-          // Optionally, handle specific errors or log them
         }
 
         console.log('Model and tags saved successfully!');
@@ -155,6 +164,21 @@ const AddModels = () => {
 
                   <div className="flex flex-col w-2/3">
                     <div className="mb-4">
+                      <label htmlFor="model_mold" className="block mb-2 text-sm font-medium text-gray-900">
+                        Model Mold:
+                      </label>
+                      <input
+                        type="text"
+                        id="model_mold"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type model mold"
+                        value={modelMold}
+                        onChange={(e) => setModelMold(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-4">
                       <label htmlFor="model_name" className="block mb-2 text-sm font-medium text-gray-900">
                         Model Name:
                       </label>
@@ -177,7 +201,7 @@ const AddModels = () => {
                         type="text"
                         id="model_color"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                        placeholder="Type model name"
+                        placeholder="Type model color"
                         value={modelColor}
                         onChange={(e) => setModelColor(e.target.value)}
                         required
@@ -191,8 +215,8 @@ const AddModels = () => {
                       <input
                         type="number"
                         id="quantity-input"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Enter quantity"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type model quantity"
                         value={modelQuantity}
                         onChange={(e) => setModelQuantity(e.target.value)}
                         required
@@ -200,39 +224,71 @@ const AddModels = () => {
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="purchase-date" className="block mb-2 text-sm font-medium text-gray-900">
+                      <label htmlFor="purchase_date" className="block mb-2 text-sm font-medium text-gray-900">
                         Purchase Date:
                       </label>
                       <input
                         type="date"
-                        id="purchase-date"
+                        id="purchase_date"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                         value={purchaseDate}
                         onChange={(e) => setPurchaseDate(e.target.value)}
+                        required
                       />
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="purchase-price" className="block mb-2 text-sm font-medium text-gray-900">
+                      <label htmlFor="purchase_price" className="block mb-2 text-sm font-medium text-gray-900">
                         Purchase Price:
                       </label>
                       <input
                         type="number"
-                        id="purchase-price"
+                        id="purchase_price"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                        placeholder="Enter purchase price"
+                        placeholder="Type purchase price"
                         value={purchasePrice}
                         onChange={(e) => setPurchasePrice(e.target.value)}
+                        required
                       />
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="sale-date" className="block mb-2 text-sm font-medium text-gray-900">
+                      <label htmlFor="purchase_shipping" className="block mb-2 text-sm font-medium text-gray-900">
+                        Purchase Shipping:
+                      </label>
+                      <input
+                        type="number"
+                        id="purchase_shipping"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type purchase shipping"
+                        value={purchaseShipping}
+                        onChange={(e) => setPurchaseShipping(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="purchase_fees" className="block mb-2 text-sm font-medium text-gray-900">
+                        Purchase Fees:
+                      </label>
+                      <input
+                        type="number"
+                        id="purchase_fees"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type purchase fees"
+                        value={purchaseFees}
+                        onChange={(e) => setPurchaseFees(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="sale_date" className="block mb-2 text-sm font-medium text-gray-900">
                         Sale Date:
                       </label>
                       <input
                         type="date"
-                        id="sale-date"
+                        id="sale_date"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                         value={saleDate}
                         onChange={(e) => setSaleDate(e.target.value)}
@@ -240,16 +296,44 @@ const AddModels = () => {
                     </div>
 
                     <div className="mb-4">
-                      <label htmlFor="sale-price" className="block mb-2 text-sm font-medium text-gray-900">
+                      <label htmlFor="sale_price" className="block mb-2 text-sm font-medium text-gray-900">
                         Sale Price:
                       </label>
                       <input
                         type="number"
-                        id="sale-price"
+                        id="sale_price"
                         className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
-                        placeholder="Enter sale price"
+                        placeholder="Type sale price"
                         value={salePrice}
                         onChange={(e) => setSalePrice(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="sale_shipping" className="block mb-2 text-sm font-medium text-gray-900">
+                        Sale Shipping:
+                      </label>
+                      <input
+                        type="number"
+                        id="sale_shipping"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type sale shipping"
+                        value={saleShipping}
+                        onChange={(e) => setSaleShipping(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="mb-4">
+                      <label htmlFor="sale_fees" className="block mb-2 text-sm font-medium text-gray-900">
+                        Sale Fees:
+                      </label>
+                      <input
+                        type="number"
+                        id="sale_fees"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
+                        placeholder="Type sale fees"
+                        value={saleFees}
+                        onChange={(e) => setSaleFees(e.target.value)}
                       />
                     </div>
 
@@ -257,34 +341,25 @@ const AddModels = () => {
                       <label htmlFor="tags" className="block mb-2 text-sm font-medium text-gray-900">
                         Tags:
                       </label>
-                      <TagDropdown
-                        selectedTags={selectedTags}
-                        setSelectedTags={setSelectedTags}
-                      />
+                      <TagDropdown selectedTags={selectedTags} setSelectedTags={setSelectedTags} />
                     </div>
-
-                    <div className="flex gap-4 mt-6">
-                      <button
-                        type="submit"
-                        className="w-full text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                      >
-                        Save Model
-                      </button>
-                      <button
-                        type="button"
-                        className="w-full text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-                        onClick={closeModal}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-
-                    {error && (
-                      <div className="mt-4 text-red-500 text-sm">
-                        {error}
-                      </div>
-                    )}
                   </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                  >
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg ml-4"
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </button>
                 </div>
               </form>
             </div>

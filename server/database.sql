@@ -1,4 +1,3 @@
--- Create the database
 CREATE DATABASE ebaytrack_inventory;
 
 \c ebaytrack_inventory
@@ -6,6 +5,7 @@ CREATE DATABASE ebaytrack_inventory;
 -- Table to store model inventory details
 CREATE TABLE model_inventory (
     model_id SERIAL PRIMARY KEY,
+    model_mold VARCHAR(255) NOT NULL,
     model_name VARCHAR(255) NOT NULL,
     model_image VARCHAR(255),
     model_color VARCHAR(255), 
@@ -16,8 +16,11 @@ CREATE TABLE model_inventory (
 CREATE TABLE purchase_data (
     purchase_id SERIAL PRIMARY KEY,
     model_id INT REFERENCES model_inventory(model_id) ON DELETE CASCADE,
+    purchase_quantity INT,
     purchase_date DATE,
     purchase_price DECIMAL(10,2),
+    purchase_shipping DECIMAL(10,2),
+    purchase_fees DECIMAL(10,2),
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
 
@@ -25,7 +28,10 @@ CREATE TABLE purchase_data (
 CREATE TABLE sale_data (
     sale_id SERIAL PRIMARY KEY,
     model_id INT REFERENCES model_inventory(model_id) ON DELETE CASCADE,
+    sale_quantity INT,
     sale_date TIMESTAMP NOT NULL,
+    sale_shipping DECIMAL(10,2),
+    sale_fees DECIMAL(10,2),
     sale_price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
@@ -66,4 +72,3 @@ CREATE TABLE scraped_idyb (
     scraped_idyb_color VARCHAR(255),
     scraped_idyb_image VARCHAR(255)
 );
-
