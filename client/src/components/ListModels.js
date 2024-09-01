@@ -166,27 +166,51 @@ const ListModels = () => {
     )}
   </div>
 
-  {/* Button container */}
-  <div className="flex gap-2 mt-auto">
+{/* Button container */}
+<div className="flex flex-col gap-2 mt-10">
+  {/* Buy and Sell buttons */}
+  <div className="flex gap-2 mb-2">
     <button
-      className="bg-green-500 text-white px-4 py-2 rounded"
+      className="bg-green-500 text-white px-4 py-2 rounded flex-1"
+      onClick={() => { /* Buy functionality here */ }}
+    >
+      Buy
+    </button>
+    <button
+      className="bg-red-500 text-white px-4 py-2 rounded flex-1"
+      onClick={() => { /* Sell functionality here */ }}
+    >
+      Sell
+    </button>
+  </div>
+
+  {/* Functional text links with separators */}
+  <div className="flex justify-center gap-2">
+    <button
+      className="text-gray-400 px-3 py-0.5"
       onClick={() => setIsLogsTableOpen(true)} // Open LogsTable
     >
       Logs
     </button>
+    <span className="text-gray-500 py-0.5">|</span>
     <button
-      className="bg-blue-500 text-white px-4 py-2 rounded"
+      className="text-gray-400 px-3 py-0.5"
       onClick={() => openEditModal(model)}
     >
       Edit
     </button>
+    <span className="text-gray-500 py-0.5">|</span>
     <button
-      className="bg-red-500 text-white px-4 py-2 rounded"
+      className="text-gray-400 px-3 py-0.5"
       onClick={() => deleteModel(model.model_id)}
     >
       Delete
     </button>
   </div>
+</div>
+
+
+
 </li>
 
         ))}
