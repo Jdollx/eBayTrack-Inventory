@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import EditModels from "./EditModels";
 import AddModels from "./AddModels";
 import LogsTable from "./Logs/LogsTable";
+import BuyModel from "./Buy Button/BuyButton";
 
 const ListModels = () => {
   const [models, setModels] = useState([]);
@@ -10,6 +11,8 @@ const ListModels = () => {
   const [tags, setTags] = useState({});
   const [modelTags, setModelTags] = useState({});
   const [isLogsTableOpen, setIsLogsTableOpen] = useState(false);
+  const [isBuyModelOpen, setIsBuyModelOpen] = useState(false); // State for BuyModel modal
+  const [buyModelData, setBuyModelData] = useState(null);
 
   // Function to format date as mm/dd/yyyy
   const formatDate = (dateString) => {
@@ -96,9 +99,17 @@ const ListModels = () => {
     setIsModalOpen(true);
   };
 
+  // for buy button modal 
+  const openBuyModelModal = (model) => {
+    setBuyModelData(model); // Set the model data for the BuyModel modal
+    setIsBuyModelOpen(true); // Open the BuyModel modal
+  };
+  
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedModel(null);
+    setIsBuyModelOpen(false);
+    setBuyModelData(null);
   };
 
   // Function to handle saving updates
@@ -172,7 +183,8 @@ const ListModels = () => {
   <div className="flex gap-2 mb-2">
     <button
       className="bg-green-500 text-white px-4 py-2 rounded flex-1"
-      onClick={() => { /* Buy functionality here */ }}
+      onClick={() => openBuyModelModal(model)}
+
     >
       Buy
     </button>
@@ -227,6 +239,13 @@ const ListModels = () => {
       <LogsTable
           isOpen={isLogsTableOpen}
           onClose={() => setIsLogsTableOpen(false)}
+        />
+      )}
+      {isBuyModelOpen && (
+        <BuyModel
+          model={buyModelData}
+          closeModal={closeModal}
+          onSave={handleSave}
         />
       )}
     </div>

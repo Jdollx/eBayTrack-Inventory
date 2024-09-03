@@ -196,18 +196,13 @@ app.delete("/models/:id", async(req,res) => {
 });
 
 app.post('/purchases', async (req, res) => {
-    console.log('Request body:', req.body);
     try {
-        let { model_id, purchase_date, purchase_price } = req.body;
-
-        if (!model_id || !purchase_date || !purchase_price) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
+        let { model_id, purchase_quantity, purchase_date, purchase_price, purchase_fees, purchase_shipping } = req.body;
 
         // Here, purchase_date should already be in the correct format (yyyy-mm-dd)
         const result = await pool.query(
-            'INSERT INTO purchase_data (model_id, purchase_date, purchase_price) VALUES ($1, $2, $3) RETURNING *',
-            [model_id, purchase_date, purchase_price]
+            'INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_fees, purchase_shipping) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [model_id, purchase_quantity, purchase_date, purchase_price, purchase_fees, purchase_shipping]
         );
 
         res.status(201).json(result.rows[0]);
