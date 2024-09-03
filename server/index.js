@@ -124,6 +124,7 @@ app.get("/models", async (req, res) => {
         const allModels = await pool.query(
             `SELECT 
                 mi.model_id, 
+                mi.model_mold,
                 mi.model_name, 
                 mi.model_image, 
                 mi.model_color, 

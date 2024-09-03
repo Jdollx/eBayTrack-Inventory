@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const BuyModel = ({ closeModal, onSave }) => {
+const BuyModel = ({ model, closeModal, onSave }) => {
     console.log("BuyModel component rendered");
 
     const [models, setModels] = useState([]);
@@ -71,10 +71,10 @@ const BuyModel = ({ closeModal, onSave }) => {
             aria-hidden="true"
             className="fixed inset-0 z-50 flex items-center justify-center w-full h-full overflow-x-hidden overflow-y-auto bg-gray-800 bg-opacity-50"
         >
-            <div className="relative w-full max-w-3xl p-6 max-h-screen">
-                <div className="relative bg-white rounded-lg shadow-md">
+            <div className="relative w-full max-w-3xl p-6 max-h-screen bg-white rounded-lg shadow-md">
+                <div className="relative">
                     <div className="flex items-center justify-between p-4 border-b border-gray-200 rounded-t">
-                        <h3 className="text-lg font-semibold text-gray-900">Purchase Model</h3>
+                        <h3 className="text-lg font-semibold text-gray-900">Purchase {model?.model_name || 'Model'}</h3>
                         <button
                             type="button"
                             className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
@@ -102,23 +102,18 @@ const BuyModel = ({ closeModal, onSave }) => {
                     <form className="p-6" onSubmit={handleSubmit}>
                         {error && <p className="text-red-500 mb-4">{error}</p>}
                         <div className="mb-4">
-                            <label htmlFor="model" className="block text-sm font-medium text-gray-900">Model</label>
-                            <select
-                                id="model"
-                                value={selectedModel}
-                                onChange={(e) => setSelectedModel(e.target.value)}
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
-                                required
-                            >
-                                <option value="">Select a model</option>
-                                {models.map(model => (
-                                    <option key={model.model_id} value={model.model_id}>{model.model_name}</option>
-                                ))}
-                            </select>
+                            <label htmlFor="model_name" className="block text-sm font-medium text-gray-900">Model:</label>
+                            <input
+                                type="text"
+                                id="model_name"
+                                value={model ? `${model.model_mold} > ${model.model_name} > ${model.model_color}` : 'Model'}
+                                readOnly
+                                className="bg-gray-100 border border-gray-300 text-gray-500 text-sm rounded-lg w-full p-2.5 cursor-not-allowed"
+                            />
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="purchase_quantity" className="block text-sm font-medium text-gray-900">Quantity</label>
+                            <label htmlFor="purchase_quantity" className="block text-sm font-medium text-gray-900">Purchase Quantity:</label>
                             <input
                                 type="number"
                                 id="purchase_quantity"
@@ -130,7 +125,7 @@ const BuyModel = ({ closeModal, onSave }) => {
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="purchase_price" className="block text-sm font-medium text-gray-900">Price</label>
+                            <label htmlFor="purchase_price" className="block text-sm font-medium text-gray-900">Purchase Price:</label>
                             <input
                                 type="number"
                                 id="purchase_price"
@@ -142,7 +137,7 @@ const BuyModel = ({ closeModal, onSave }) => {
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="purchase_date" className="block text-sm font-medium text-gray-900">Date</label>
+                            <label htmlFor="purchase_date" className="block text-sm font-medium text-gray-900">Purchase Date:</label>
                             <input
                                 type="date"
                                 id="purchase_date"
@@ -154,7 +149,7 @@ const BuyModel = ({ closeModal, onSave }) => {
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="purchase_shipping" className="block text-sm font-medium text-gray-900">Shipping</label>
+                            <label htmlFor="purchase_shipping" className="block text-sm font-medium text-gray-900">Shipping Price:</label>
                             <input
                                 type="number"
                                 id="purchase_shipping"
@@ -166,7 +161,7 @@ const BuyModel = ({ closeModal, onSave }) => {
                         </div>
 
                         <div className="mb-4">
-                            <label htmlFor="purchase_fees" className="block text-sm font-medium text-gray-900">Fees</label>
+                            <label htmlFor="purchase_fees" className="block text-sm font-medium text-gray-900">Purchase Fees:</label>
                             <input
                                 type="number"
                                 id="purchase_fees"
