@@ -5,7 +5,7 @@ const BuyModel = ({ model, closeModal, onSave }) => {
 
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
-    const [purchaseQuantity, setPurchaseQuantity] = useState('');
+    const [purchaseQuantity, setPurchaseQuantity] = useState(0);
     const [purchasePrice, setPurchasePrice] = useState('');
     const [purchaseDate, setPurchaseDate] = useState('');
     const [purchaseShipping, setPurchaseShipping] = useState('');
@@ -29,20 +29,32 @@ const BuyModel = ({ model, closeModal, onSave }) => {
         fetchModels();
     }, []);
 
+    const handleQuantityChange = (e) => {
+        const value = e.target.value;
+        setPurchaseQuantity(value === '' ? 0 : parseInt(value, 10));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+    
+        // convert string input to float
+        const quantity = parseInt(purchaseQuantity, 10) || 0;
+        const price = parseFloat(purchasePrice) || 0;
+        const shipping = parseFloat(purchaseShipping) || 0;
+        const fees = parseFloat(purchaseFees) || 0;
+    
         try {
             const purchaseResponse = await fetch('http://localhost:3000/purchases', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model_id: selectedModel,
-                    purchase_quantity: purchaseQuantity,
-                    purchase_price: purchasePrice,
-                    purchase_date: purchaseDate,
-                    purchase_shipping: purchaseShipping,
-                    purchase_fees: purchaseFees,
-                }),
+                    model: selectedModel,
+                    quantity,
+                    price,
+                    date: purchaseDate,
+                    shipping,
+                    fees
+                })
             });
 
             if (!purchaseResponse.ok) {
@@ -118,7 +130,7 @@ const BuyModel = ({ model, closeModal, onSave }) => {
                                 type="number"
                                 id="purchase_quantity"
                                 value={purchaseQuantity}
-                                onChange={(e) => setPurchaseQuantity(e.target.value)}
+                                onChange={handleQuantityChange}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
                                 required
                             />

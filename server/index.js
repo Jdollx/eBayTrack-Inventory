@@ -206,6 +206,12 @@ app.post('/purchases', async (req, res) => {
             [model_id, purchase_quantity, purchase_date, purchase_price, purchase_fees, purchase_shipping]
         );
 
+        // update model inventory quantity according to purchase quantity
+        await pool.query(
+            'UPDATE model_inventory SET model_quantity = model_quantity + $1 WHERE model_id = $2',
+            [purchase_quantity, model_id]
+        );
+
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error inserting purchase:', error);
