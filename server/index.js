@@ -63,10 +63,11 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
         const modelId = newModel.rows[0].model_id;
 
         // Insert purchase data if provided
+        // uses model quantity as the basis
         if (purchase_date) {
             await pool.query(
                 "INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees) VALUES ($1, $2, $3, $4, $5, $6)", 
-                [modelId, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees]
+                [modelId, model_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees]
             );
         }
 
