@@ -200,38 +200,48 @@ app.delete("/models/:id", async(req,res) => {
 });
 
 app.post('/purchases', async (req, res) => {
-    try {
-        let { model_id, purchase_quantity, purchase_date, purchase_price, purchase_fees, purchase_shipping } = req.body;
+    const { model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees } = req.body;
 
-        // Here, purchase_date should already be in the correct format (yyyy-mm-dd)
-        const result = await pool.query(
-            'INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_fees, purchase_shipping) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [model_id, purchase_quantity, purchase_date, purchase_price, purchase_fees, purchase_shipping]
+    if (!model_id || purchase_quantity == null || !purchase_date || purchase_price == null || purchase_shipping == null || purchase_fees == null) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+        // Check if the model_id exists in the model_inventory table
+        const modelExists = await pool.query(
+            'SELECT * FROM model_inventory WHERE model_id = $1',
+            [model_id]
         );
 
-        // update model inventory quantity according to purchase quantity
+        if (modelExists.rows.length === 0) {
+            return res.status(404).json({ error: 'Model not found' });
+        }
+
+        // Insert purchase record
+        const result = await pool.query(
+            'INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees]
+        );
+
+        console.log('Purchase record inserted:', result.rows[0]);
+
+        // Update model inventory - Add purchase quantity to existing quantity
         await pool.query(
-            'UPDATE model_inventory SET model_quantity = model_quantity + $1 WHERE model_id = $2',
+            'UPDATE model_inventory SET model_quantity = COALESCE(model_quantity, 0) + $1 WHERE model_id = $2',
             [purchase_quantity, model_id]
         );
 
+        console.log('Model inventory updated for model_id:', model_id);
+
         res.status(201).json(result.rows[0]);
     } catch (error) {
-        console.error('Error inserting purchase:', error);
-        res.status(500).json({ error: 'Server Error', details: error.message });
+        console.error('Error handling purchase:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// get a specific model inventory
-app.get("/purchases", async (req, res) => {
-    try {
-        const allPurchases = await pool.query("SELECT * FROM purchase_data"); // Fixed table name
-        res.json(allPurchases.rows);
-    } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ error: 'Server Error' });
-    }
-});
+
+
 
 // create sale data
 app.post("/sales", async(req,res) => {
