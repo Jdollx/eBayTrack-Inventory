@@ -241,6 +241,19 @@ app.post('/purchases', async (req, res) => {
     }
 });
 
+app.get("/purchases", async(req,res) => {
+    try {
+        // takes the inputted search and queries it
+        const{id} = req.params;
+        const oneModel = await pool.query(
+            "SELECT * FROM purchase_data"
+        );
+        res.json(oneModel.rows);
+    } catch (error) {
+        console.error(error.message);
+        
+    }
+});
 
 
 
