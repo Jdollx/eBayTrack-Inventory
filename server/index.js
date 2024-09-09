@@ -75,7 +75,7 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
         if (sale_date) {
             await pool.query(
                 "INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees) VALUES ($1, $2, $3, $4, $5, $6)", 
-                [modelId, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees]
+                [modelId, model_quantity, sale_date, sale_price, sale_shipping, sale_fees]
             );
         }
 
@@ -256,20 +256,56 @@ app.get("/purchases", async(req,res) => {
 });
 
 
-
 // create sale data
-app.post("/sales", async(req,res) => {
-    try {
-        // get sale data from client side via express.json
-        const { model_id, sale_date, sale_price } = req.body;
-        // insert new sale data into the database
-        const newSale = await pool.query(
-            "INSERT INTO sale_data (model_id, sale_date, sale_price) VALUES ($1, $2, $3) RETURNING *", 
-            [model_id, sale_date, sale_price]
-        );
-        // return the row of the most recently inserted
-        res.json(newSale.rows[0]);
+app.post('/sales', async (req, res) => {
+    const { model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees } = req.body;
 
+    if (!model_id || sale_quantity == null || !sale_date || sale_price == null || sale_shipping == null || sale_fees == null) {
+        return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    try {
+        // Check if the model_id exists in the model_inventory table
+        const modelExists = await pool.query(
+            'SELECT * FROM model_inventory WHERE model_id = $1',
+            [model_id]
+        );
+
+        if (modelExists.rows.length === 0) {
+            return res.status(404).json({ error: 'Model not found' });
+        }
+
+        // Insert sale record
+        const result = await pool.query(
+            'INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees]
+        );
+
+        console.log('Sale record inserted:', result.rows[0]);
+
+        // Update model inventory - Add purchase quantity to existing quantity
+        await pool.query(
+            'UPDATE model_inventory SET model_quantity = COALESCE(model_quantity, 0) - $1 WHERE model_id = $2',
+            [sale_quantity, model_id]
+        );
+
+        console.log('Model inventory updated for model_id:', model_id);
+
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error handling sale:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get("/sales", async(req,res) => {
+    try {
+        // takes the inputted search and queries it
+        const{id} = req.params;
+        const oneModel = await pool.query(
+            "SELECT * FROM sale_data"
+        );
+        res.json(oneModel.rows);
     } catch (error) {
         console.error(error.message);
         
