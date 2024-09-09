@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AddModels from '../AddModels';
 
 const BuyModel = ({ model, closeModal, onSave }) => {
     console.log("BuyModel component rendered");
@@ -29,31 +30,21 @@ const BuyModel = ({ model, closeModal, onSave }) => {
         fetchModels();
     }, []);
 
-    const handleQuantityChange = (e) => {
-        const value = e.target.value;
-        setPurchaseQuantity(value === '' ? 0 : parseInt(value, 10));
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
-        // convert string input to float
-        const quantity = parseInt(purchaseQuantity, 10) || 0;
-        const price = parseFloat(purchasePrice) || 0;
-        const shipping = parseFloat(purchaseShipping) || 0;
-        const fees = parseFloat(purchaseFees) || 0;
     
         try {
             const purchaseResponse = await fetch('http://localhost:3000/purchases', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    model: selectedModel,
-                    quantity,
-                    price,
-                    date: purchaseDate,
-                    shipping,
-                    fees
+                    model_id: model?.model_id,
+                    purchase_quantity: Number(purchaseQuantity),
+                    purchase_date: purchaseDate,
+                    purchase_price: Number(purchasePrice),
+                    purchase_shipping: Number(purchaseShipping),
+                    purchase_fees: Number(purchaseFees)
                 })
             });
 
@@ -130,7 +121,7 @@ const BuyModel = ({ model, closeModal, onSave }) => {
                                 type="number"
                                 id="purchase_quantity"
                                 value={purchaseQuantity}
-                                onChange={handleQuantityChange}
+                                onChange={(e) => setPurchaseQuantity(e.target.value)}
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
                                 required
                             />
