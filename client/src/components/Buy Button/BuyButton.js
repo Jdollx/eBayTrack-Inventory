@@ -5,7 +5,7 @@ const BuyModel = ({ model, closeModal, onSave }) => {
 
     const [models, setModels] = useState([]);
     const [selectedModel, setSelectedModel] = useState('');
-    const [purchaseQuantity, setPurchaseQuantity] = useState(0);
+    const [purchaseQuantity, setPurchaseQuantity] = useState('');
     const [purchasePrice, setPurchasePrice] = useState('');
     const [purchaseDate, setPurchaseDate] = useState('');
     const [purchaseShipping, setPurchaseShipping] = useState('');
