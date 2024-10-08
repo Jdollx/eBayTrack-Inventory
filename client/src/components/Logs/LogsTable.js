@@ -3,6 +3,7 @@ import React, {useState, useEffect} from 'react';
 
 const LogsTable = ({ isOpen, onClose }) => {
   const [models, setModels] = useState([]);
+  const [transactions, setTransactions] =useState([]);
 
 
   const getModel = async () => {
@@ -18,6 +19,20 @@ const LogsTable = ({ isOpen, onClose }) => {
       console.error("Error getting model:", error.message);
     }
   };
+
+
+  const getTransactions = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/transactions`, {
+        method: "GET",
+      });
+      const data = await response.json();
+      setTransactions(data);
+  
+    } catch (error) {
+      console.error("Error getting model:", error.message);
+    }
+  };
   
       useEffect(() => {
         if (isOpen) {
@@ -27,7 +42,7 @@ const LogsTable = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
-      <div className="bg-white p-4 rounded shadow-lg w-3/4 max-w-4xl relative">
+      <div className="bg-white p-4 rounded shadow-lg w-3/4 max-w-4xl relative overflow-auto">
         <button
           className="absolute top-2 right-2 text-gray-500 text-2xl"
           onClick={onClose}
@@ -35,31 +50,32 @@ const LogsTable = ({ isOpen, onClose }) => {
           &times;
         </button>
         <h2 className="text-xl font-semibold mb-4">{models.length > 0 ? `${models[0].model_name} History` : "Model History"}</h2>
-        <table className="table-fixed w-full">
+        <table className="table-auto w-full">
           <thead>
             <tr>
-              <th className="px-4 py-2 border">Song</th>
-              <th className="px-4 py-2 border">Artist</th>
-              <th className="px-4 py-2 border">Year</th>
+              <th className="px-4 py-2 border">Date</th>
+              <th className="px-4 py-2 border">Transaction</th>
+              <th className="px-4 py-2 border">Quantity</th>
+              <th className="px-4 py-2 border">Price</th>
+              <th className="px-4 py-2 border">Profit/Loss</th>
+              <th className="px-4 py-2 border">Tags</th>
             </tr>
           </thead>
           <tbody>
+          {transactions.length > 0 ? (
+            transactions.map(transaction => (
+              <tr key={transaction.transaction_id}>
+                <td className="px-4 py-2 border">TEST</td>
+              </tr>
+            ))
+          ) : (
             <tr>
-              <td className="px-4 py-2 border">The Sliding Mr. Bones (Next Stop, Pottersville)</td>
-              <td className="px-4 py-2 border">Malcolm Lockyer</td>
-              <td className="px-4 py-2 border">1961</td>
+              <td colSpan="6" className="px-4 py-2 border text-center">
+                No transactions available
+              </td>
             </tr>
-            <tr>
-              <td className="px-4 py-2 border">Witchy Woman</td>
-              <td className="px-4 py-2 border">The Eagles</td>
-              <td className="px-4 py-2 border">1972</td>
-            </tr>
-            <tr>
-              <td className="px-4 py-2 border">Shining Star</td>
-              <td className="px-4 py-2 border">Earth, Wind, and Fire</td>
-              <td className="px-4 py-2 border">1975</td>
-            </tr>
-          </tbody>
+          )}
+        </tbody>
         </table>
       </div>
       <div className="inset-0 bg-black rounded-lg opacity-50"></div>

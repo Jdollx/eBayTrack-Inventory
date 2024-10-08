@@ -451,6 +451,20 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+// get transactions
+app.get('/transactions', async (req, res) => {
+    const query = 
+    `SELECT * FROM transactions_logs`;
+    
+    pool.query(query, (error, results) => {
+        if (error) {
+            res.status(400).send(error.message);
+        } else {
+            res.json(results.rows);
+        }
+    });
+});
+
 
 
 // to start server with express, we need port
