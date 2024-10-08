@@ -43,6 +43,8 @@ CREATE TABLE transactions_logs (
     transaction_type SMALLINT,
     transaction_date DATE,
     transaction_price DECIMAL(10,2),
+    transaction_shipping DECIMAL(10,2),
+    transaction_fees DECIMAL (10,2),
     transaction_quantity INT NOT NULL,
     transaction_profit DECIMAL(10,2) DEFAULT 0.00,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE

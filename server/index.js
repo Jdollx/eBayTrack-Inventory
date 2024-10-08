@@ -234,6 +234,16 @@ app.post('/purchases', async (req, res) => {
 
         console.log('Model inventory updated for model_id:', model_id);
 
+        // insert purchase into transaction
+        // transaction type small int
+        await pool.query(
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+            [model_id, 1, purchase_date, purchase_price, purchase_quantity, 0, purchase_shipping, purchase_fees]
+        );
+        
+
+        console.log('Transaction logged successfully');
+
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error handling purchase:', error.message);
@@ -312,24 +322,24 @@ app.get("/sales", async(req,res) => {
     }
 });
 
-// create transaction log
-app.post("/transactions", async(req,res) => {
-    try {
-        // get tansaction log from client side via express.json
-        const { model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit } = req.body;
-        // insert new transaction log into the database
-        const newTransaction = await pool.query(
-            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
-            [model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit]
-        );
-        // return the row of the most recently inserted
-        res.json(newTransaction.rows[0]);
+// // create transaction log
+// app.post("/transactions", async(req,res) => {
+//     try {
+//         // get tansaction log from client side via express.json
+//         const { model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit } = req.body;
+//         // insert new transaction log into the database
+//         const newTransaction = await pool.query(
+//             "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *",
+//             [model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, profit]
+//         );
+//         // return the row of the most recently inserted
+//         res.json(newTransaction.rows[0]);
 
-    } catch (error) {
-        console.error(error.message);
+//     } catch (error) {
+//         console.error(error.message);
         
-    }
-});
+//     }
+// });
 
 // create tags (no model association)
 app.post("/tags", async (req, res) => {
@@ -455,7 +465,7 @@ app.get('/api/search', async (req, res) => {
 app.get('/transactions', async (req, res) => {
     const query = 
     `SELECT * FROM transactions_logs`;
-    
+
     pool.query(query, (error, results) => {
         if (error) {
             res.status(400).send(error.message);
