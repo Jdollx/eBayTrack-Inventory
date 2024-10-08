@@ -208,7 +208,7 @@ const ListModels = () => {
   </div>
 
   {/* Functional text links with separators */}
-  <div className="flex justify-center gap-2">
+  <div className="text-gray-500 py-0.5">
     <button
       className="text-gray-400 px-3 py-0.5"
       onClick={() => setIsLogsTableOpen(true)} // Open LogsTable

@@ -1,8 +1,29 @@
 // ModalTable.js
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 
 const LogsTable = ({ isOpen, onClose }) => {
-  if (!isOpen) return null;
+  const [models, setModels] = useState([]);
+
+
+  const getModel = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/models`, {
+        method: "GET",
+      });
+
+      const data = await response.json();
+      setModels(data);
+  
+    } catch (error) {
+      console.error("Error getting model:", error.message);
+    }
+  };
+  
+      useEffect(() => {
+        if (isOpen) {
+          getModel();
+        }
+      }, [isOpen]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -13,7 +34,7 @@ const LogsTable = ({ isOpen, onClose }) => {
         >
           &times;
         </button>
-        <h2 className="text-xl font-semibold mb-4">Song List</h2>
+        <h2 className="text-xl font-semibold mb-4">{models.length > 0 ? `${models[0].model_name} History` : "Model History"}</h2>
         <table className="table-fixed w-full">
           <thead>
             <tr>
@@ -41,7 +62,7 @@ const LogsTable = ({ isOpen, onClose }) => {
           </tbody>
         </table>
       </div>
-      <div className="fixed inset-0 bg-black opacity-50"></div>
+      <div className="inset-0 bg-black rounded-lg opacity-50"></div>
     </div>
   );
 };
