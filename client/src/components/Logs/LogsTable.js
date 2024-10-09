@@ -37,6 +37,7 @@ const LogsTable = ({ isOpen, onClose }) => {
       useEffect(() => {
         if (isOpen) {
           getModel();
+          getTransactions();
         }
       }, [isOpen]);
 
@@ -65,8 +66,13 @@ const LogsTable = ({ isOpen, onClose }) => {
           {transactions.length > 0 ? (
             transactions.map(transaction => (
               <tr key={transaction.transaction_id}>
-                <td className="px-4 py-2 border">TEST</td>
-              </tr>
+              <td className="px-4 py-2 border">{new Date(transaction.transaction_date).toLocaleDateString()}</td>
+              <td className="px-4 py-2 border">{transaction.transaction_type === 1 ? 'Purchase' : 'Sale'}</td>
+              <td className="px-4 py-2 border">{transaction.transaction_quantity}</td>
+              <td className="px-4 py-2 border">{transaction.transaction_price}</td>
+              <td className="px-4 py-2 border">{transaction.transaction_profit}</td>
+              <td className="px-4 py-2 border">[Tags Placeholder]</td>
+            </tr>
             ))
           ) : (
             <tr>
