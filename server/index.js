@@ -231,6 +231,11 @@ app.post('/purchases', async (req, res) => {
             [model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees]
         );
 
+        const transactionResult = await pool.query(
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+            [model_id, 1, purchase_date, purchase_price, purchase_quantity, 0, purchase_shipping, purchase_fees]
+        );
+
         console.log('Purchase record inserted:', result.rows[0]);
 
         // Update model inventory - Add purchase quantity to existing quantity
