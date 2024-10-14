@@ -3,7 +3,8 @@ import React, {useState, useEffect} from 'react';
 
 const LogsTable = ({ isOpen, onClose }) => {
   const [models, setModels] = useState([]);
-  const [transactions, setTransactions] =useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [tagsMap, setTagsMap] =  useState({});
 
 
   const getModel = async () => {
@@ -33,13 +34,34 @@ const LogsTable = ({ isOpen, onClose }) => {
       console.error("Error getting model:", error.message);
     }
   };
+
+  const getModelTags = async (transactions) => {
+    const tagsPromises = transactions.map(async (transaction) => {
+      const modelId = transaction.model_id;
+      if (!tagsMap[modelId]) {
+        const response = await fetch(`http://localhost:3000/models/${modelId}/tags`);
+        const tags = await response.json();
+        setTagsMap(prev => ({ ...prev, [modelId]: tags }));
+      }
+    });
+
+    await Promise.all(tagsPromises);
+  };
   
       useEffect(() => {
         if (isOpen) {
           getModel();
-          getTransactions();
+          getTransactions()
         }
       }, [isOpen]);
+
+      // called after transactions are called to keep tags loading corectly
+      useEffect(() => {
+        if (transactions.length > 0) {
+          getModelTags(transactions);
+        }
+      }, [transactions]);
+    
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
@@ -71,7 +93,7 @@ const LogsTable = ({ isOpen, onClose }) => {
               <td className="px-4 py-2 border">{transaction.transaction_quantity}</td>
               <td className="px-4 py-2 border">{transaction.transaction_price}</td>
               <td className="px-4 py-2 border">{transaction.transaction_profit}</td>
-              <td className="px-4 py-2 border">[Tags Placeholder]</td>
+              <td className="px-4 py-2 border">{tagsMap[transaction.model_id] ? tagsMap[transaction.model_id].map(tag => tag.tag_name).join(', ') : 'Loading...'}</td>
             </tr>
             ))
           ) : (
