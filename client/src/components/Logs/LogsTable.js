@@ -1,5 +1,6 @@
 // ModalTable.js
 import React, {useState, useEffect} from 'react';
+import calculateProfitLoss from './ProfitLossCalc';
 
 const LogsTable = ({ isOpen, onClose }) => {
   const [models, setModels] = useState([]);

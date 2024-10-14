@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import AddModels from '../AddModels';
 
 const SellModel = ({ model, closeModal, onSave }) => {
-    console.log("BuyModel component rendered");
-
     const [models, setModels] = useState([]);
-    const [selectedModel, setSelectedModel] = useState('');
+    const [purchases, setPurchases] = useState([]);
+    const [selectedPurchase, setSelectedPurchase] = useState('');
     const [saleQuantity, setSaleQuantity] = useState('');
     const [salePrice, setSalePrice] = useState('');
     const [saleDate, setSaleDate] = useState('');
@@ -17,53 +15,72 @@ const SellModel = ({ model, closeModal, onSave }) => {
         const fetchModels = async () => {
             try {
                 const response = await fetch('http://localhost:3000/models');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
                 const data = await response.json();
                 setModels(data);
             } catch (error) {
-                console.error('Error fetching models. Make sure /models returns', error.message);
                 setError('Error fetching models');
             }
         };
-        fetchModels();
-    }, []);
 
+        const fetchPurchases = async (modelId) => {
+            try {
+                const response = await fetch(`http://localhost:3000/purchases?model_id=${modelId}`);
+                const data = await response.json();
+                setPurchases(data);
+            } catch (error) {
+                setError('Error fetching purchases');
+            }
+        };
+
+        fetchModels();
+        if (model) fetchPurchases(model.model_id);
+    }, [model]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
+        // Validate selected purchase
+        if (!selectedPurchase) {
+            setError('Please select a purchase.');
+            return;
+        }
+
+        // Create the payload
+        const payload = {
+            model_id: model.model_id,
+            purchase_id: selectedPurchase,
+            sale_quantity: Number(saleQuantity),
+            sale_date: saleDate,
+            sale_price: Number(salePrice),
+            sale_shipping: Number(saleShipping),
+            sale_fees: Number(SaleFees)
+        };
+
+        console.log('Payload:', payload); // Log the payload for debugging
+
         try {
             const saleResponse = await fetch('http://localhost:3000/sales', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model_id: model?.model_id,
-                    sale_quantity: Number(saleQuantity),
-                    sale_date: saleDate,
-                    sale_price: Number(salePrice),
-                    sale_shipping: Number(saleShipping),
-                    sale_fees: Number(SaleFees)
-                })
+                body: JSON.stringify(payload)
             });
 
             if (!saleResponse.ok) {
                 throw new Error(`HTTP error! Status: ${saleResponse.status}`);
             }
 
-            setSelectedModel('');
+            // Reset form states
+            setSelectedPurchase('');
             setSaleQuantity('');
             setSalePrice('');
             setSaleDate('');
             setSaleShipping('');
             setSaleFees('');
 
-            if (onSave) onSave(); // Optionally call onSave to notify parent of success
-            closeModal(); // Close the modal after successful submission
+            if (onSave) onSave();
+            closeModal();
         } catch (error) {
-            console.error('Sale error: ', error.message);
-            setError('Error submitting sale');
+            setError('Error submitting sale: ' + error.message);
         }
     };
 
@@ -104,6 +121,7 @@ const SellModel = ({ model, closeModal, onSave }) => {
 
                     <form className="p-6" onSubmit={handleSubmit}>
                         {error && <p className="text-red-500 mb-4">{error}</p>}
+
                         <div className="mb-4">
                             <label htmlFor="model_name" className="block text-sm font-medium text-gray-900">Model:</label>
                             <input
@@ -113,6 +131,24 @@ const SellModel = ({ model, closeModal, onSave }) => {
                                 readOnly
                                 className="bg-gray-100 border border-gray-300 text-gray-500 text-sm rounded-lg w-full p-2.5 cursor-not-allowed"
                             />
+                        </div>
+
+                        <div className="mb-4">
+                            <label htmlFor="selected_purchase" className="block text-sm font-medium text-gray-900">Select Purchase:</label>
+                            <select
+                                id="selected_purchase"
+                                value={selectedPurchase}
+                                onChange={(e) => setSelectedPurchase(e.target.value)}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
+                                required
+                            >
+                                <option value="">Select a purchase</option>
+                                {purchases.map(purchase => (
+                                    <option key={purchase.purchase_id} value={purchase.purchase_id}>
+                                        {`Purchased on ${new Date(purchase.purchase_date).toLocaleDateString()} - Quantity: ${purchase.purchase_quantity} - Price: ${purchase.purchase_price}`}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="mb-4">
