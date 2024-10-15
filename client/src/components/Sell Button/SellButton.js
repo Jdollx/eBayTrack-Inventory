@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 const SellModel = ({ model, closeModal, onSave }) => {
     const [models, setModels] = useState([]);
-    const [purchases, setPurchases] = useState([]);
+    const [purchases, setPurchases] = useState([]); // All purchases
+    const [displayedPurchases, setDisplayedPurchases] = useState([]); // Purchases for dropdown
     const [selectedPurchase, setSelectedPurchase] = useState('');
     const [saleQuantity, setSaleQuantity] = useState('');
     const [salePrice, setSalePrice] = useState('');
@@ -27,6 +28,7 @@ const SellModel = ({ model, closeModal, onSave }) => {
                 const response = await fetch(`http://localhost:3000/purchases?model_id=${modelId}`);
                 const data = await response.json();
                 setPurchases(data);
+                setDisplayedPurchases(data); // Initialize displayed purchases
             } catch (error) {
                 setError('Error fetching purchases');
             }
@@ -45,18 +47,15 @@ const SellModel = ({ model, closeModal, onSave }) => {
             return;
         }
 
-        // Create the payload
         const payload = {
             model_id: model.model_id,
-            purchase_id: selectedPurchase,
+            purchase_id: Number(selectedPurchase),
             sale_quantity: Number(saleQuantity),
             sale_date: saleDate,
             sale_price: Number(salePrice),
             sale_shipping: Number(saleShipping),
             sale_fees: Number(SaleFees)
         };
-
-        console.log('Payload:', payload); // Log the payload for debugging
 
         try {
             const saleResponse = await fetch('http://localhost:3000/sales', {
@@ -68,6 +67,11 @@ const SellModel = ({ model, closeModal, onSave }) => {
             if (!saleResponse.ok) {
                 throw new Error(`HTTP error! Status: ${saleResponse.status}`);
             }
+
+            // Update displayed purchases to exclude the sold purchase
+            setDisplayedPurchases((prev) =>
+                prev.filter(purchase => purchase.purchase_id !== Number(selectedPurchase))
+            );
 
             // Reset form states
             setSelectedPurchase('');
@@ -143,7 +147,7 @@ const SellModel = ({ model, closeModal, onSave }) => {
                                 required
                             >
                                 <option value="">Select a purchase</option>
-                                {purchases.map(purchase => (
+                                {displayedPurchases.map(purchase => (
                                     <option key={purchase.purchase_id} value={purchase.purchase_id}>
                                         {`Purchased on ${new Date(purchase.purchase_date).toLocaleDateString()} - Quantity: ${purchase.purchase_quantity} - Price: ${purchase.purchase_price}`}
                                     </option>
