@@ -34,6 +34,7 @@ CREATE TABLE sale_data (
     sale_fees DECIMAL(10,2),
     sale_price DECIMAL(10,2) NOT NULL,
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
+    purchase_id INT REFERENCES purchase_data(purchase_id) ON DELETE SET NULL;
 );
 
 -- Table to store transaction logs
@@ -47,6 +48,7 @@ CREATE TABLE transactions_logs (
     transaction_fees DECIMAL (10,2),
     transaction_quantity INT NOT NULL,
     transaction_profit DECIMAL(10,2) DEFAULT 0.00,
+    purchase_id INT REFERENCES purchase_data(purchase_id) ON DELETE SET NULL;
     FOREIGN KEY (model_id) REFERENCES model_inventory(model_id) ON DELETE CASCADE
 );
 

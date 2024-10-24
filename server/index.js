@@ -278,7 +278,7 @@ app.get("/purchases", async(req,res) => {
 
 // create sale data
 app.post('/sales', async (req, res) => {
-    const { model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees } = req.body;
+    const { model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchase_id } = req.body;
 
     if (!model_id || sale_quantity == null || !sale_date || sale_price == null || sale_shipping == null || sale_fees == null) {
         return res.status(400).json({ error: 'All fields are required' });
@@ -297,13 +297,13 @@ app.post('/sales', async (req, res) => {
 
         // Insert sale record
         const result = await pool.query(
-            'INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
-            [model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees]
+            'INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            [model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchase_id]
         );
 
         const transactionResult = await pool.query(
-            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-            [model_id, 0, sale_date, sale_price, sale_quantity, 0, sale_shipping, sale_fees]
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+            [model_id, 0, sale_date, sale_price, sale_quantity, 0, sale_shipping, sale_fees, purchase_id]
         );
 
         console.log('Sale record inserted:', result.rows[0]);
