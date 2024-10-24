@@ -71,6 +71,7 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
             );
         
             // Use purchase_quantity for transaction_quantity
+            // transaction type = 1 (boolean)
             await pool.query(
                 "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
                 [modelId, 1, purchase_date, purchase_price, model_quantity, 0, purchase_shipping, purchase_fees]
@@ -83,6 +84,13 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
             await pool.query(
                 "INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees) VALUES ($1, $2, $3, $4, $5, $6)", 
                 [modelId, model_quantity, sale_date, sale_price, sale_shipping, sale_fees]
+            );
+
+            // Use sale_quantity for transaction_quantity
+            // transaction type = 0
+            await pool.query(
+                "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+                [modelId, 0, sale_date, sale_price, model_quantity, 0, sale_shipping, sale_fees]
             );
         }
 
@@ -291,6 +299,11 @@ app.post('/sales', async (req, res) => {
         const result = await pool.query(
             'INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
             [model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees]
+        );
+
+        const transactionResult = await pool.query(
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+            [model_id, 0, sale_date, sale_price, sale_quantity, 0, sale_shipping, sale_fees]
         );
 
         console.log('Sale record inserted:', result.rows[0]);
