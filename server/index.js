@@ -65,16 +65,26 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
         // Insert purchase data if provided
         // uses model quantity as the basis
         if (purchase_date) {
-            await pool.query(
-                "INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees) VALUES ($1, $2, $3, $4, $5, $6)", 
+            const purchaseResult = await pool.query(
+                "INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees) VALUES ($1, $2, $3, $4, $5, $6) RETURNING purchase_id", 
                 [modelId, model_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees]
             );
-        
-            // Use purchase_quantity for transaction_quantity
-            // transaction type = 1 (boolean)
+
+            // Log purchaseResult to check what was returned
+            console.log('purchaseResult:', purchaseResult);
+
+            // Check if purchaseResult is valid
+            if (!purchaseResult.rows || purchaseResult.rows.length === 0) {
+                return res.status(500).json({ error: "Failed to insert purchase data or retrieve purchase_id" });
+            }
+
+            const purchaseId = purchaseResult.rows[0].purchase_id; // Get purchase_id from purchaseResult
+            console.log('purchaseId:', purchaseId); // Log purchaseId to ensure it's being captured correctly
+
+            // Insert transaction log for purchase
             await pool.query(
-                "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-                [modelId, 1, purchase_date, purchase_price, model_quantity, 0, purchase_shipping, purchase_fees]
+                "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+                [modelId, 1, purchase_date, purchase_price, model_quantity, 0, purchase_shipping, purchase_fees, purchaseId]
             );
         }
         
@@ -233,18 +243,22 @@ app.post('/purchases', async (req, res) => {
             return res.status(404).json({ error: 'Model not found' });
         }
 
-        // Insert purchase record
+        // Insert purchase record and retrieve purchase_id
         const result = await pool.query(
-            'INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            'INSERT INTO purchase_data (model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees) VALUES ($1, $2, $3, $4, $5, $6) RETURNING purchase_id',
             [model_id, purchase_quantity, purchase_date, purchase_price, purchase_shipping, purchase_fees]
         );
 
-        const transactionResult = await pool.query(
-            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-            [model_id, 1, purchase_date, purchase_price, purchase_quantity, 0, purchase_shipping, purchase_fees]
-        );
+        // Get purchase_id from the inserted record
+        const { purchase_id } = result.rows[0];
+        console.log('Inserted Purchase ID:', purchase_id);
 
-        console.log('Purchase record inserted:', result.rows[0]);
+        // Insert transaction log with the correct purchase_id
+        const transactionResult = await pool.query(
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+            [model_id, 1, purchase_date, purchase_price, purchase_quantity, 0, purchase_shipping, purchase_fees, purchase_id]
+        );
+        console.log('Transaction log inserted:', transactionResult.rows[0]);
 
         // Update model inventory - Add purchase quantity to existing quantity
         await pool.query(
@@ -254,12 +268,14 @@ app.post('/purchases', async (req, res) => {
 
         console.log('Model inventory updated for model_id:', model_id);
 
+        // Return response with inserted purchase data
         res.status(201).json(result.rows[0]);
     } catch (error) {
         console.error('Error handling purchase:', error.message);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 app.get("/purchases", async(req,res) => {
     try {
@@ -297,18 +313,21 @@ app.post('/sales', async (req, res) => {
 
         // Insert sale record
         const result = await pool.query(
-            'INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+            'INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING sale_id', 
             [model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchase_id]
         );
 
+        const saleId = result.rows[0].sale_id;
+
+        // Insert sale transaction log (transaction_type = 0 for sale)
         const transactionResult = await pool.query(
-            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
-            [model_id, 0, sale_date, sale_price, sale_quantity, 0, sale_shipping, sale_fees, purchase_id]
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees, sale_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+            [model_id, 0, sale_date, sale_price, sale_quantity, 0, sale_shipping, sale_fees, saleId]
         );
 
         console.log('Sale record inserted:', result.rows[0]);
 
-        // Update model inventory - Add purchase quantity to existing quantity
+        // Update model inventory - Deduct sale quantity from existing quantity
         await pool.query(
             'UPDATE model_inventory SET model_quantity = COALESCE(model_quantity, 0) - $1 WHERE model_id = $2',
             [sale_quantity, model_id]
@@ -322,6 +341,7 @@ app.post('/sales', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 
 app.get("/sales", async(req,res) => {
     try {
