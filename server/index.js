@@ -90,19 +90,20 @@ app.post("/models", upload.single('model_image'), async (req, res) => {
         
 
         // Insert sale data if provided
-        if (sale_date) {
-            await pool.query(
-                "INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees) VALUES ($1, $2, $3, $4, $5, $6)", 
-                [modelId, model_quantity, sale_date, sale_price, sale_shipping, sale_fees]
-            );
-
-            // Use sale_quantity for transaction_quantity
-            // transaction type = 0
-            await pool.query(
-                "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
-                [modelId, 0, sale_date, sale_price, model_quantity, 0, sale_shipping, sale_fees]
-            );
+        if (sale_date) { 
+        const saleResult = await pool.query(
+            "INSERT INTO sale_data (model_id, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING sale_id", 
+            [modelId, sale_quantity, sale_date, sale_price, sale_shipping, sale_fees, purchaseId]
+        );
+        
+        const saleId = saleResult.rows[0].sale_id;
+        
+        await pool.query(
+            "INSERT INTO transactions_logs (model_id, transaction_type, transaction_date, transaction_price, transaction_quantity, transaction_profit, transaction_shipping, transaction_fees, purchase_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *",
+            [modelId, 0, sale_date, sale_price, sale_quantity, 0, sale_shipping, sale_fees, purchaseId]
+        );
         }
+        
 
         // Insert tags if provided
         if (tags) {

@@ -4,6 +4,7 @@ const LogsTable = ({ isOpen, onClose }) => {
   const [models, setModels] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [purchases, setPurchases] = useState([]);
+  const [sales, setSales] = useState([]);  // State to store sales
   const [tagsMap, setTagsMap] = useState({});
 
   const getModel = async () => {
@@ -36,11 +37,22 @@ const LogsTable = ({ isOpen, onClose }) => {
     }
   };
 
+  const getSales = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/sales`);
+      const data = await response.json();
+      setSales(data);
+    } catch (error) {
+      console.error("Error getting sales:", error.message);
+    }
+  };
+
   useEffect(() => {
     if (isOpen) {
       getModel();
       getTransactions();
       getPurchases();
+      getSales();  // Fetch sales data
     }
   }, [isOpen]);
 
@@ -61,6 +73,7 @@ const LogsTable = ({ isOpen, onClose }) => {
             <tr>
               <th className="px-4 py-2 border">Date</th>
               <th className="px-4 py-2 border">Purchase ID</th>
+              <th className="px-4 py-2 border">Sale ID</th> {/* Add Sale ID column */}
               <th className="px-4 py-2 border">Transaction</th>
               <th className="px-4 py-2 border">Quantity</th>
               <th className="px-4 py-2 border">Price</th>
@@ -72,23 +85,30 @@ const LogsTable = ({ isOpen, onClose }) => {
             {transactions.length > 0 ? (
               transactions.map(transaction => {
                 let purchaseIds = []; // Array to hold matching purchase IDs
+                let saleIds = []; // Array to hold matching sale IDs
+
                 if (transaction.transaction_type === 1) {
-                  // Only look for purchases when the transaction type is 1
                   const matchingPurchases = purchases.filter(p =>
                     p.model_id === transaction.model_id &&
                     new Date(p.purchase_date).toISOString().split('T')[0] === new Date(transaction.transaction_date).toISOString().split('T')[0]
                   );
 
-                  // Collect all matching purchase IDs
                   purchaseIds = matchingPurchases.map(p => p.purchase_id);
                 } else if (transaction.transaction_type === 0) {
-                  purchaseIds.push(transaction.purchase_id || 'N/A'); // Add purchase ID if available
+                  const matchingSales = sales.filter(s =>
+                    s.model_id === transaction.model_id &&
+                    new Date(s.sale_date).toISOString().split('T')[0] === new Date(transaction.transaction_date).toISOString().split('T')[0]
+                  );
+
+                  saleIds = matchingSales.map(s => s.sale_id);
+                  purchaseIds.push(transaction.purchase_id || 'N/A');
                 }
 
                 return (
                   <tr key={transaction.transaction_id}>
                     <td className="px-4 py-2 border">{new Date(transaction.transaction_date).toLocaleDateString()}</td>
                     <td className="px-4 py-2 border">{purchaseIds.length > 0 ? purchaseIds.join(', ') : 'N/A'}</td>
+                    <td className="px-4 py-2 border">{saleIds.length > 0 ? saleIds.join(', ') : 'N/A'}</td> {/* Display Sale IDs */}
                     <td className="px-4 py-2 border">{transaction.transaction_type === 1 ? 'Purchase' : 'Sale'}</td>
                     <td className="px-4 py-2 border">{transaction.transaction_quantity}</td>
                     <td className="px-4 py-2 border">{transaction.transaction_price}</td>
@@ -99,7 +119,7 @@ const LogsTable = ({ isOpen, onClose }) => {
               })
             ) : (
               <tr>
-                <td colSpan="7" className="px-4 py-2 border text-center">
+                <td colSpan="8" className="px-4 py-2 border text-center">
                   No transactions available
                 </td>
               </tr>
